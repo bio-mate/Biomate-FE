@@ -1,47 +1,45 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import apiRequest from "../../utils/api";
-import { v4 as uuidv4 } from "uuid";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import InputField from "../../Atoms/InputField";
 import CustomButton from "../../Atoms/CustomButton";
 import ProgressBar from "../../Atoms/ProgressBar";
-import PhotoUpload from "../../Atoms/PhotoUpload";
-import UserPreviewPage from "./UserPreviewPage";
+import axios from "axios";
 
 const AddProfile = () => {
   const [step, setStep] = useState(1);
-  const [userId, setUserId] = useState(uuidv4()); // Generate a unique user ID
+  const navigate = useNavigate();
+
+  // States for each section
   const [personalDetails, setPersonalDetails] = useState({
-    firstName: "",
-    lastName: "",
+    first_name: "",
+    middle_name: "",
+    last_name: "",
     age: "",
     gender: "",
-    bloodGroup: "",
+    blood_group: "",
     complexion: "",
     height: "",
     weight: "",
   });
 
-  const [religiousBackground, setReligiousBackground] = useState({
-    religion: "",
+  const [religiousDetails, setReligiousDetails] = useState({
     caste: "",
     subCaste: "",
     language: "",
+    gotra: "",
   });
 
   const [astroDetails, setAstroDetails] = useState({
-    dateOfBirth: "",
-    placeOfBirth: "",
-    timeOfBirth: "",
+    dob: "",
+    pob: "",
+    tob: "",
     rashi: "",
-    nakshatra: "",
-    gotra: "",
+    nakshtra: "",
   });
 
   const [familyDetails, setFamilyDetails] = useState({
     fatherName: "",
     motherName: "",
+    brotherName: "",
     fatherOccupation: "",
     motherOccupation: "",
     noOfBrothers: "",
@@ -53,1187 +51,719 @@ const AddProfile = () => {
     collegeName: "",
   });
 
-  const [careerDetails, setCareerDetails] = useState({
-    employedIn: "",
+  const [employmentDetails, setEmploymentDetails] = useState({
+    employeeIn: "",
     companyName: "",
     designation: "",
     income: "",
   });
 
-  const [lifestyle, setLifestyle] = useState({
-    diet: "",
+  const [address, setAddress] = useState({
+    state: "",
+    district: "",
+    residentialAddress: "",
+    permanentAddress: "",
   });
 
-  const [contactInformation, setContactInformation] = useState({
-    contactNumber: "",
-    address: {
-      country: "",
-      state: "",
-      district: "",
-      residentialAddress: "",
-      permanentAddress: "",
-    },
-    linkedInUrl: "",
-    instagramUrl: "",
-    facebookUrl: "",
+  const [socialMedia, setSocialMedia] = useState({
+    facebook: "",
+    linkedin: "",
+    instagram: "",
   });
 
-  const [imagePreviews, setImagePreviews] = useState({
-    profileImages: [],
-    kundaliImages: [],
-  });
-  const [profiles, setProfiles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const titles = [
-    "Personal",
-    "Religious",
-    "Astro",
-    "Family",
-    "Edu & Career",
-    "Lifestyle",
-    "Contact",
-    "Upload Photo",
-    "Upload Photo",
-    "Upload Photo",
-  ];
+  const [profileImages, setProfileImages] = useState([{ url: "", status: 1 }]);
+  const [kundaliImages, setKundaliImages] = useState([{ url: "", status: 1 }]);
 
-  const navigate = useNavigate();
+  const [paymentStatus, setPaymentStatus] = useState("pending");
+  const [isPublished, setIsPublished] = useState(false);
+  const [diet, setDiet] = useState("");
+  const [errors, setErrors] = useState({});
 
+  // Validator function
+  const validateFields = () => {
+    const newErrors = {};
+
+    if (step === 1) {
+      if (!personalDetails.first_name.trim())
+        newErrors.first_name = "First name is required.";
+      if (!personalDetails.middle_name.trim())
+        newErrors.middle_name = "Middle name is required.";
+      if (!personalDetails.last_name.trim())
+        newErrors.last_name = "Last name is required.";
+      if (!personalDetails.age || personalDetails.age < 18)
+        newErrors.age = "Age must be 18 or older.";
+      if (!personalDetails.gender) newErrors.gender = "Gender is required.";
+    }
+
+    if (step === 2) {
+      if (!religiousDetails.caste.trim())
+        newErrors.caste = "Caste is required.";
+      if (!religiousDetails.subCaste.trim())
+        newErrors.subCaste = "Sub caste is required.";
+    }
+
+    if (step === 3) {
+      if (!astroDetails.dob) newErrors.dob = "Date of birth is required.";
+      if (!astroDetails.pob.trim())
+        newErrors.pob = "Place of birth is required.";
+    }
+
+    if (step === 4) {
+      if (!familyDetails.fatherName.trim())
+        newErrors.fatherName = "Father's name is required.";
+    }
+
+    if (step === 5) {
+      if (!educationDetails.degree.trim())
+        newErrors.degree = "Degree is required.";
+    }
+
+    if (step === 6) {
+      if (!employmentDetails.employeeIn.trim())
+        newErrors.employeeIn = "Employment status is required.";
+    }
+
+    if (step === 7) {
+      if (!diet) newErrors.diet = "Diet preference is required.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handler for updating input fields
+  const handleChange = (e, setState) => {
+    const { name, value } = e.target;
+    setState((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+
+    // Clear error when input is changed
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "",
+    }));
+  };
+
+  // Navigate through steps
   const handleNext = () => {
-    setStep(step + 1);
-  };
-
-  const handlePrevious = () => {
-    setStep(step - 1);
-  };
-  useEffect(() => {
-    const fetchProfiles = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:4000/api/profile/viewProfile"
-        );
-        setProfiles(response.data);
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-        setError("Could not fetch profiles. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfiles();
-  }, []);
-
-  const handleGenderSelect = (gender) => {
-    setPersonalDetails({ ...personalDetails, gender });
-    console.log("gender", gender);
-  };
-
-  const bloodGroups = [
-    {
-      value: "A Positive (A+)",
-      label: "A Positive (A+)",
-      icon: "/path/to/a-positive-icon.png",
-    },
-    {
-      value: "A Negative (A-)",
-      label: "A Negative (A-)",
-      icon: "/path/to/a-negative-icon.png",
-    },
-    {
-      value: "B Positive (B+)",
-      label: "B Positive (B+)",
-      icon: "/path/to/b-positive-icon.png",
-    },
-    {
-      value: "B Negative (B-)",
-      label: "B Negative (B-)",
-      icon: "/path/to/b-negative-icon.png",
-    },
-    {
-      value: "AB Positive (AB+)",
-      label: "AB Positive (AB+)",
-      icon: "/path/to/ab-positive-icon.png",
-    },
-    {
-      value: "AB Negative (AB-)",
-      label: "AB Negative (AB-)",
-      icon: "/path/to/ab-negative-icon.png",
-    },
-    {
-      value: "O Positive (O+)",
-      label: "O Positive (O+)",
-      icon: "/path/to/o-positive-icon.png",
-    },
-    {
-      value: "O Negative (O-)",
-      label: "O Negative (O-)",
-      icon: "/path/to/o-negative-icon.png",
-    },
-  ];
-
-  const handleBloodGroupSelect = (bloodGroup) => {
-    setPersonalDetails({ ...personalDetails, bloodGroup });
-  };
-
-  const complexions = [
-    { value: "Fair", label: "Fair", icon: "/groom.png" },
-    {
-      value: "Wheatish",
-      label: "Wheatish",
-      icon: "/groom.png",
-    },
-    { value: "Dusky", label: "Dusky", icon: "/groom.png" },
-    { value: "Dark", label: "Dark", icon: "/groom.png" },
-  ];
-
-  const handleComplexionSelect = (complexion) => {
-    setPersonalDetails({ ...personalDetails, complexion });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-
-    // Append user data to FormData
-    formData.append("userId", userId); // Use stored userId
-    formData.append("personalDetails", JSON.stringify(personalDetails));
-    formData.append("religiousBackground", JSON.stringify(religiousBackground));
-    formData.append("astroDetails", JSON.stringify(astroDetails));
-    formData.append("familyDetails", JSON.stringify(familyDetails));
-    formData.append("educationDetails", JSON.stringify(educationDetails));
-    formData.append("careerDetails", JSON.stringify(careerDetails));
-    formData.append("lifestyle", JSON.stringify(lifestyle));
-    formData.append("contactInformation", JSON.stringify(contactInformation));
-
-    console.log("formdata", formData);
-    try {
-      const response = await apiRequest(
-        "POST",
-        "http://localhost:4000/api/profile/addProfile",
-        formData,
-        {
-          "Content-Type": "multipart/form-data",
-        }
-      );
-      if (response.status === 201) {
-        console.log(response.data.message);
-        // Optionally navigate to another page or show a success message
-      }
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    if (validateFields()) {
+      setStep(step + 1);
     }
   };
 
-  const handleImageUpload = (newImage) => {
-    setImagePreviews((prev) => ({
-      ...prev,
-      profileImages: [...prev.profileImages, newImage],
-    }));
+  const handlePrevious = () => setStep(step - 1);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      personalDetails,
+      religiousDetails,
+      astroDetails,
+      familyDetails,
+      educationDetails,
+      employmentDetails,
+      address,
+      socialMedia,
+      profileImages,
+      kundaliImages,
+      paymentStatus,
+      isPublished,
+      diet,
+    };
+
+    // Retrieve token
+    const token =
+      "18df68359fbef5047b03501aa8ecf465:7ce454f3c536cc51f912102e8904da7f92abb465ce60c1a51cd6ccec917bdff96a32a02e094111ea5e0884edd1909b21a7c85d7263245fe8f1a527e09bef1af5eb0a93e3a88f4425c00f306d33298b433f5fe1cdc5343d9a8fa51d44e7a0c3dd1a956a253411d179a209d9acb67671ee9205ff35172463338cd08f01b0f2525369d2093078ed159bc79311a07b3f438494e04f2476dfac9a646f678e6e2c4355f4e88724493cd91514d5cbfe359ab62d2d9a6f801543e5ec2832261c2134033e4f6e065e9554c29066b0077711863b7757a6356b09b44e955893c54fa8426b3fbfc1db1f441328d358db6c5beaeb51e7e93e312974dbd167ac9c4092cec56ffceacbb1d3768e2b30888da8c92c1f42414d9e6046b94c947ee0270e9568fdaa1b7e83e6be1fb37de9f63088e3dddfadb03ef50b177421dda0c489b9dd54f14d7bd4ca0a0ee804e6b59c713da2a64e619e4414d310bd49c5ad70e9d5f76252314ad98a36f4715b9cab1bf1e04788968cc2db23a41d09bfe2fbea6f97e970bd9555974f644de03bb9035fadb74f978970992c22074df2be4392d6028c98633ffeaa122ba689c9b617cfffb1181fe8a908d96d3420059b46cc5ea8c111cfb3cbb3c0f11b2efe9ae74726ffffc563fbfd97953a277f8ebaa649d53b8e4b33e66df1cdb3f254d3cd58901bfcf9b0bc50d6087b0725e595c8a4bca7e321e0d7857aa73d9887672617"; // Use actual token retrieval logic
+
+    if (!token) {
+      console.error("No token found. Please log in.");
+      return; // Exit if there's no token
+    }
+
+    try {
+      const response = await axios.post("/mate/api/v1/profile/save", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("Response:", response.data);
+      navigate("/success"); // Navigate on success
+    } catch (error) {
+      console.error(
+        "Error:",
+        error.response ? error.response.data : error.message
+      );
+    }
   };
 
-  const handleKundaliUpload = (image) => {
-    setImagePreviews((prev) => ({
-      ...prev,
-      kundaliImages: [...prev.kundaliImages, image],
+  const handleImageUpload = (e, type) => {
+    const files = Array.from(e.target.files);
+    console.log("files", files);
+    const newImages = files.map((file) => ({
+      url: URL.createObjectURL(file), // For previewing
+      lastModified: file.lastModified,
+      lastModifiedDate: file.lastModifiedDate,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      status: 1, // Default status
     }));
+    console.log("newImages", newImages);
+    if (type === "profile") {
+      setProfileImages(newImages);
+    } else if (type === "kundali") {
+      setKundaliImages(newImages);
+    }
   };
-
-  const removeImage = (index) => {
-    setImagePreviews((prev) => ({
-      ...prev,
-      profileImages: prev.profileImages.filter((_, i) => i !== index),
-    }));
-  };
-  console.log("profilesprofilesprofiles", profiles);
-  const handleFeetChange = (e) => {
-    setPersonalDetails({
-      ...personalDetails,
-      height: { ...personalDetails.height, feet: e.target.value },
-    });
-  };
-
-  const handleInchesChange = (e) => {
-    setPersonalDetails({
-      ...personalDetails,
-      height: { ...personalDetails.height, inches: e.target.value },
-    });
-  };
-  const heightString = `${personalDetails.height.feet}'${personalDetails.height.inches}''`;
 
   return (
-    <form onSubmit={handleSubmit} enctype="multipart/form-data">
+    <form onSubmit={handleSubmit}>
+      <ProgressBar
+        currentStep={step}
+        titles={[
+          "Personal",
+          "Religious",
+          "Astro",
+          "Family",
+          "Education",
+          "Employment",
+          "Other",
+        ]}
+      />
+
       {step === 1 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h2>Personal Details</h2>
+          <h3>Personal Details</h3>
+          <label>
+            First Name:<span style={{ color: "red" }}> *</span>
+          </label>
+          <input
+            type="text"
+            name="first_name"
+            value={personalDetails.first_name}
+            onChange={(e) => handleChange(e, setPersonalDetails)}
+            style={{ borderColor: errors.first_name ? "red" : "" }}
+          />
+          {errors.first_name && (
+            <p style={{ color: "red" }}>{errors.first_name}</p>
+          )}
 
+          <label>
+            Middle Name:<span style={{ color: "red" }}> *</span>
+          </label>
           <input
             type="text"
-            placeholder="Enter First Name"
-            value={personalDetails.firstName}
-            onChange={(e) =>
-              setPersonalDetails({
-                ...personalDetails,
-                firstName: e.target.value,
-              })
-            }
-            required
+            name="middle_name"
+            value={personalDetails.middle_name}
+            onChange={(e) => handleChange(e, setPersonalDetails)}
+            style={{ borderColor: errors.middle_name ? "red" : "" }}
           />
+          {errors.middle_name && (
+            <p style={{ color: "red" }}>{errors.middle_name}</p>
+          )}
+
+          <label>
+            Last Name:<span style={{ color: "red" }}> *</span>
+          </label>
           <input
             type="text"
-            placeholder="Last Name"
-            value={personalDetails.lastName}
-            onChange={(e) =>
-              setPersonalDetails({
-                ...personalDetails,
-                lastName: e.target.value,
-              })
-            }
-            required
+            name="last_name"
+            value={personalDetails.last_name}
+            onChange={(e) => handleChange(e, setPersonalDetails)}
+            style={{ borderColor: errors.last_name ? "red" : "" }}
           />
+          {errors.last_name && (
+            <p style={{ color: "red" }}>{errors.last_name}</p>
+          )}
+
+          <label>
+            Age:<span style={{ color: "red" }}> *</span>
+          </label>
           <input
             type="number"
-            placeholder="Age"
+            name="age"
             value={personalDetails.age}
-            onChange={(e) =>
-              setPersonalDetails({ ...personalDetails, age: e.target.value })
-            }
-            required
+            onChange={(e) => handleChange(e, setPersonalDetails)}
+            style={{ borderColor: errors.age ? "red" : "" }}
           />
+          {errors.age && <p style={{ color: "red" }}>{errors.age}</p>}
 
-          {/* <select
-            value={personalDetails.bloodGroup}
-            onChange={(e) =>
-              setPersonalDetails({
-                ...personalDetails,
-                bloodGroup: e.target.value,
-              })
-            }
-            required
+          <label>
+            Gender:<span style={{ color: "red" }}> *</span>
+          </label>
+          <select
+            name="gender"
+            value={personalDetails.gender}
+            onChange={(e) => handleChange(e, setPersonalDetails)}
+            style={{ borderColor: errors.gender ? "red" : "" }}
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+          {errors.gender && <p style={{ color: "red" }}>{errors.gender}</p>}
+
+          <label>Blood Group:</label>
+          <select
+            name="blood_group"
+            value={personalDetails.blood_group}
+            onChange={(e) => handleChange(e, setPersonalDetails)}
           >
             <option value="">Select Blood Group</option>
-            <option value="A Positive (A+)">A Positive (A+)</option>
-            <option value="A Negative (A-)">A Negative (A-)</option>
-            <option value="B Positive (B+)">B Positive (B+)</option>
-            <option value="B Negative (B-)">B Negative (B-)</option>
-            <option value="AB Positive (AB+)">AB Positive (AB+)</option>
-            <option value="AB Negative (AB-)">AB Negative (AB-)</option>
-            <option value="O Positive (O+)">O Positive (O+)</option>
-            <option value="O Negative (O-)">O Negative (O-)</option>
-          </select> */}
-
-          
-          {/* <select
-            value={personalDetails.complexion}
-            onChange={(e) =>
-              setPersonalDetails({
-                ...personalDetails,
-                complexion: e.target.value,
-              })
-            }
-            required
-          >
-            <option value="">Select Complexion</option>
-            <option value="Fair">Fair</option>
-            <option value="Wheatish">Wheatish</option>
-            <option value="Dusky">Dusky</option>
-            <option value="Dark">Dark</option>
-          </select> */}
-
-          {/* <div>
-            <h3>Select Complexion</h3>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "space-around",
-                marginBottom: "10px",
-              }}
-            >
-              {complexions.map(({ value, label, icon }) => (
-                <div
-                  key={value}
-                  onClick={() => handleComplexionSelect(value)}
-                  style={{
-                    cursor: "pointer",
-                    padding: "10px",
-                    border:
-                      personalDetails.complexion === value
-                        ? "2px solid blue"
-                        : "1px solid gray",
-                    textAlign: "center",
-                    margin: "5px",
-                    borderRadius: "5px",
-                  }}
-                >
-                  <img
-                    src={icon}
-                    alt={label}
-                    style={{ width: "50px", marginBottom: "5px" }}
-                  />
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
-            <input type="hidden" value={personalDetails.complexion} required />
-          </div>*/}
-          <select
-            value={personalDetails.height}
-            onChange={(e) =>
-              setPersonalDetails({
-                ...personalDetails,
-                height: e.target.value,
-              })
-            }
-            required
-          >
-            <option value="">Select Height</option>
-            <option value="4'5''">4'5''</option>
-            <option value="4'6''">4'6''</option>
-            <option value="4'7''">4'7''</option>
-            <option value="4'8''">4'8''</option>
-            <option value="4'9''">4'9''</option>
-            <option value="4'10''">4'10''</option>
-            <option value="4'11''">4'11''</option>
-            <option value="5'0''">5'0''</option>
-            <option value="5'1''">5'1''</option>
-            <option value="5'2''">5'2''</option>
-            <option value="5'3''">5'3''</option>
-            <option value="5'4''">5'4''</option>
-            <option value="5'5''">5'5''</option>
-            <option value="5'6''">5'6''</option>
-            <option value="5'7''">5'7''</option>
-            <option value="5'8''">5'8''</option>
-            <option value="5'9''">5'9''</option>
-            <option value="5'10''">5'10''</option>
-            <option value="5'11''">5'11''</option>
-            <option value="6'1''">6'1''</option>
-            <option value="6'2''">6'2''</option>
-            <option value="6'3''">6'3''</option>
-            <option value="6'4''">6'4''</option>
-            <option value="6'5''">6'5''</option>
+            <option value="A+">A+</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B-">B-</option>
+            <option value="O+">O+</option>
+            <option value="O-">O-</option>
+            <option value="AB+">AB+</option>
+            <option value="AB-">AB-</option>
           </select>
+
+          <label>Complexion:</label>
           <input
-            type="number"
-            placeholder="Weight"
-            value={personalDetails.weight}
-            onChange={(e) =>
-              setPersonalDetails({
-                ...personalDetails,
-                weight: e.target.value,
-              })
-            }
-            required
+            type="text"
+            name="complexion"
+            value={personalDetails.complexion}
+            onChange={(e) => handleChange(e, setPersonalDetails)}
           />
-          <CustomButton label="Next" type="primary" onClick={handleNext} />
+
+          <label>Height:</label>
+          <input
+            type="text"
+            name="height"
+            value={personalDetails.height}
+            onChange={(e) => handleChange(e, setPersonalDetails)}
+          />
+
+          <label>Weight:</label>
+          <input
+            type="text"
+            name="weight"
+            value={personalDetails.weight}
+            onChange={(e) => handleChange(e, setPersonalDetails)}
+          />
         </div>
       )}
+
       {step === 2 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
-          <h3>Select Gender</h3>
-          <p>Please Select your Gender</p>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-around",
-              marginBottom: "10px",
-            }}
-          >
-            <div
-              onClick={() => handleGenderSelect("Male")}
-              style={{
-                cursor: "pointer",
-                padding: "10px",
-                border:
-                  personalDetails.gender === "Male"
-                    ? "2px solid blue"
-                    : "1px solid gray",
-                marginRight: "10px",
-              }}
-            >
-              <img src="/groom.png" alt="Male" style={{ width: "150px" }} />
-              <span>Male</span>
-            </div>
-            <div
-              onClick={() => handleGenderSelect("Female")}
-              style={{
-                cursor: "pointer",
-                padding: "10px",
-                border:
-                  personalDetails.gender === "Female"
-                    ? "2px solid blue"
-                    : "1px solid gray",
-              }}
-            >
-              <img src="/bride.png" alt="Female" style={{ width: "150px" }} />
-              <span>Female</span>
-            </div>
-            {/* <div
-                onClick={() => handleGenderSelect("Other")}
-                style={{
-                  cursor: "pointer",
-                  padding: "10px",
-                  border:
-                    personalDetails.gender === "Other"
-                      ? "2px solid blue"
-                      : "1px solid gray",
-                }}
-              >
-                <img
-                  src="/path/to/other-icon.png"
-                  alt="Other"
-                  style={{ width: "50px" }}
-                />
-                <span>Other</span>
-              </div> */}
-          </div>
-          <input type="hidden" value={personalDetails.gender} required />
-          <CustomButton
-            label="Back"
-            onClick={handlePrevious}
-            type="secondary"
+          <h3>Religious Details</h3>
+          <label>
+            Caste:<span style={{ color: "red" }}> *</span>
+          </label>
+          <input
+            type="text"
+            name="caste"
+            value={religiousDetails.caste}
+            onChange={(e) => handleChange(e, setReligiousDetails)}
+            style={{ borderColor: errors.caste ? "red" : "" }}
           />
-          <CustomButton label="Next" type="primary" onClick={handleNext} />
+          {errors.caste && <p style={{ color: "red" }}>{errors.caste}</p>}
+
+          <label>
+            Sub Caste:<span style={{ color: "red" }}> *</span>
+          </label>
+          <input
+            type="text"
+            name="subCaste"
+            value={religiousDetails.subCaste}
+            onChange={(e) => handleChange(e, setReligiousDetails)}
+            style={{ borderColor: errors.subCaste ? "red" : "" }}
+          />
+          {errors.subCaste && <p style={{ color: "red" }}>{errors.subCaste}</p>}
+
+          <label>Language:</label>
+          <input
+            type="text"
+            name="language"
+            value={religiousDetails.language}
+            onChange={(e) => handleChange(e, setReligiousDetails)}
+          />
+
+          <label>Gotra:</label>
+          <input
+            type="text"
+            name="gotra"
+            value={religiousDetails.gotra}
+            onChange={(e) => handleChange(e, setReligiousDetails)}
+          />
         </div>
       )}
 
       {step === 3 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <div>
-            <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
-            <h3>Select Complexion</h3>
-            <p>Please Select your Complexion</p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)", // 2 items per row
-                gap: "10px", // space between the items
-                marginBottom: "10px",
-              }}
-            >
-              {complexions.map(({ value, label, icon }) => (
-                <div
-                  key={value}
-                  onClick={() => handleComplexionSelect(value)}
-                  style={{
-                    cursor: "pointer",
-                    padding: "10px",
-                    border:
-                      personalDetails.complexion === value
-                        ? "2px solid blue"
-                        : "1px solid gray",
-                    textAlign: "center",
-                    borderRadius: "5px",
-                  }}
-                >
-                  <img
-                    src={icon}
-                    alt={label}
-                    style={{ width: "150px", marginBottom: "5px" }}
-                  />
-                  <span>{label}</span>
-                </div>
-              ))}
-              <CustomButton
-                label="Back"
-                onClick={handlePrevious}
-                type="secondary"
-              />
-              <CustomButton label="Next" type="primary" onClick={handleNext} />
-            </div>
-
-            <input type="hidden" value={personalDetails.complexion} required />
-          </div>
-        </div>
-      )}
-      {step === 4 && (
-        // <div>
-        //   <h3>Select Height</h3>
-        //   <div
-        //     style={{
-        //       display: "flex",
-        //       alignItems: "center",
-        //       marginBottom: "10px",
-        //     }}
-        //   >
-        //     <select
-        //       value={personalDetails.height.feet}
-        //       onChange={handleFeetChange}
-        //       required
-        //       style={{ marginRight: "10px" }}
-        //     >
-        //       <option value="">Feet</option>
-        //       {[...Array(4)].map((_, index) => (
-        //         <option key={index} value={4 + index}>
-        //           {4 + index}
-        //         </option>
-        //       ))}
-        //       {[...Array(4)].map((_, index) => (
-        //         <option key={index + 4} value={8 + index}>
-        //           {8 + index}
-        //         </option>
-        //       ))}
-        //     </select>
-        //     <select
-        //       value={personalDetails.height.inches}
-        //       onChange={handleInchesChange}
-        //       required
-        //     >
-        //       <option value="">Inches</option>
-        //       {[...Array(11)].map((_, index) => (
-        //         <option key={index} value={index + 1}>
-        //           {index + 1}
-        //         </option>
-        //       ))}
-        //     </select>
-        //   </div>
-        //   <input type="hidden" value={heightString} required />
-        // </div>
-        <div>
-        <ProgressBar currentStep={step} titles={titles} />
-        <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
-            <h3>Select Blood Group</h3>
-            <p>Please Select your Blood Group</p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)", // 2 items per row
-                gap: "10px", // space between the items
-                marginBottom: "10px",
-              }}
-            >
-              {bloodGroups.map(({ value, label, icon }) => (
-                <div
-                  key={value}
-                  onClick={() => handleBloodGroupSelect(value)}
-                  style={{
-                    cursor: "pointer",
-                    padding: "10px",
-                    border:
-                      personalDetails.bloodGroup === value
-                        ? "2px solid blue"
-                        : "1px solid gray",
-                    textAlign: "center",
-                    margin: "5px",
-                    borderRadius: "5px",
-                  }}
-                >
-                  <img
-                    src={icon}
-                    alt={label}
-                    style={{ width: "50px", marginBottom: "5px" }}
-                  />
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
-            <input type="hidden" value={personalDetails.bloodGroup} required />
-            <CustomButton
-            label="Back"
-            onClick={handlePrevious}
-            type="secondary"
-          />
-          <CustomButton label="Next" type="primary" onClick={handleNext} />
-          </div> 
-          </div>
-      )}
-      {step === 5 && (
-        <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h2>Religious Background</h2>
-          <input
-            type="text"
-            placeholder="Religion"
-            value={religiousBackground.religion}
-            onChange={(e) =>
-              setReligiousBackground({
-                ...religiousBackground,
-                religion: e.target.value,
-              })
-            }
-            required
-          />
-          <input
-            type="text"
-            placeholder="Caste"
-            value={religiousBackground.caste}
-            onChange={(e) =>
-              setReligiousBackground({
-                ...religiousBackground,
-                caste: e.target.value,
-              })
-            }
-          />
-          <input
-            type="text"
-            placeholder="Sub Caste"
-            value={religiousBackground.subCaste}
-            onChange={(e) =>
-              setReligiousBackground({
-                ...religiousBackground,
-                subCaste: e.target.value,
-              })
-            }
-          />
-          <input
-            type="text"
-            placeholder="Language"
-            value={religiousBackground.language}
-            onChange={(e) =>
-              setReligiousBackground({
-                ...religiousBackground,
-                language: e.target.value,
-              })
-            }
-            required
-          />
-          <CustomButton
-            label="Back"
-            onClick={handlePrevious}
-            type="secondary"
-          />
-          <CustomButton label="Next" type="primary" onClick={handleNext} />
-        </div>
-      )}
-
-      {step === 6 && (
-        <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h2>Astrological Details</h2>
+          <h3>Astro Details</h3>
+          <label>
+            Date of Birth:<span style={{ color: "red" }}> *</span>
+          </label>
           <input
             type="date"
-            placeholder="Date of Birth"
-            value={astroDetails.dateOfBirth}
-            onChange={(e) =>
-              setAstroDetails({
-                ...astroDetails,
-                dateOfBirth: e.target.value,
-              })
-            }
-            required
+            name="dob"
+            value={astroDetails.dob}
+            onChange={(e) => handleChange(e, setAstroDetails)}
+            style={{ borderColor: errors.dob ? "red" : "" }}
           />
+          {errors.dob && <p style={{ color: "red" }}>{errors.dob}</p>}
+
+          <label>
+            Place of Birth:<span style={{ color: "red" }}> *</span>
+          </label>
           <input
             type="text"
-            placeholder="Place of Birth"
-            value={astroDetails.placeOfBirth}
-            onChange={(e) =>
-              setAstroDetails({
-                ...astroDetails,
-                placeOfBirth: e.target.value,
-              })
-            }
-            required
+            name="pob"
+            value={astroDetails.pob}
+            onChange={(e) => handleChange(e, setAstroDetails)}
+            style={{ borderColor: errors.pob ? "red" : "" }}
           />
+          {errors.pob && <p style={{ color: "red" }}>{errors.pob}</p>}
+
+          <label>Time of Birth:</label>
           <input
-            type="text"
-            placeholder="Time of Birth"
-            value={astroDetails.timeOfBirth}
-            onChange={(e) =>
-              setAstroDetails({
-                ...astroDetails,
-                timeOfBirth: e.target.value,
-              })
-            }
-          />
-          {/* <InputField
-            label="Time of Birth"
-            value={astroDetails.timeOfBirth}
-            onChange={(value) =>
-              setAstroDetails({ ...astroDetails, timeOfBirth: value })
-            }
-            required
-            placeholder="Enter Time of Birth"
-          /> */}
-          <input
-            type="text"
-            placeholder="Rashi"
-            value={astroDetails.rashi}
-            onChange={(e) =>
-              setAstroDetails({
-                ...astroDetails,
-                rashi: e.target.value,
-              })
-            }
-            required
+            type="time"
+            name="tob"
+            value={astroDetails.tob}
+            onChange={(e) => handleChange(e, setAstroDetails)}
           />
 
+          <label>Rashi:</label>
           <input
             type="text"
-            placeholder="Nakshatra"
-            value={astroDetails.nakshatra}
-            onChange={(e) =>
-              setAstroDetails({
-                ...astroDetails,
-                nakshatra: e.target.value,
-              })
-            }
+            name="rashi"
+            value={astroDetails.rashi}
+            onChange={(e) => handleChange(e, setAstroDetails)}
           />
+
+          <label>Nakshtra:</label>
           <input
             type="text"
-            placeholder="Gotra"
-            value={astroDetails.gotra}
-            onChange={(e) =>
-              setAstroDetails({
-                ...astroDetails,
-                gotra: e.target.value,
-              })
-            }
-            required
+            name="nakshtra"
+            value={astroDetails.nakshtra}
+            onChange={(e) => handleChange(e, setAstroDetails)}
           />
-          <CustomButton
-            label="Back"
-            className="btn btn-success"
-            onClick={handlePrevious}
-            type="secondary"
-          >
-            Back
-          </CustomButton>
-          <CustomButton
-            label="Next"
-            type="primary"
-            className="btn btn-success"
-            onClick={handleNext}
-          >
-            Next
-          </CustomButton>
         </div>
       )}
 
       {step === 4 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h2>Education Details</h2>
+          <h3>Family Details</h3>
+          <label>
+            Father's Name:<span style={{ color: "red" }}> *</span>
+          </label>
           <input
             type="text"
-            placeholder="Degree"
-            value={educationDetails.degree}
-            onChange={(e) =>
-              setEducationDetails({
-                ...educationDetails,
-                degree: e.target.value,
-              })
-            }
-            required
+            name="fatherName"
+            value={familyDetails.fatherName}
+            onChange={(e) => handleChange(e, setFamilyDetails)}
+            style={{ borderColor: errors.fatherName ? "red" : "" }}
           />
+          {errors.fatherName && (
+            <p style={{ color: "red" }}>{errors.fatherName}</p>
+          )}
+
+          <label>Mother's Name:</label>
           <input
             type="text"
-            placeholder="College Name"
-            value={educationDetails.collegeName}
-            onChange={(e) =>
-              setEducationDetails({
-                ...educationDetails,
-                collegeName: e.target.value,
-              })
-            }
-            required
+            name="motherName"
+            value={familyDetails.motherName}
+            onChange={(e) => handleChange(e, setFamilyDetails)}
           />
 
-          <CustomButton label="Back" onClick={handlePrevious} type="secondary">
-            Back
-          </CustomButton>
-          <CustomButton label="Next" type="primary" onClick={handleNext}>
-            Next
-          </CustomButton>
+          <label>Brother's Name:</label>
+          <input
+            type="text"
+            name="brotherName"
+            value={familyDetails.brotherName}
+            onChange={(e) => handleChange(e, setFamilyDetails)}
+          />
+
+          <label>Father's Occupation:</label>
+          <input
+            type="text"
+            name="fatherOccupation"
+            value={familyDetails.fatherOccupation}
+            onChange={(e) => handleChange(e, setFamilyDetails)}
+          />
+
+          <label>Mother's Occupation:</label>
+          <input
+            type="text"
+            name="motherOccupation"
+            value={familyDetails.motherOccupation}
+            onChange={(e) => handleChange(e, setFamilyDetails)}
+          />
+
+          <label>No. of Brothers:</label>
+          <input
+            type="number"
+            name="noOfBrothers"
+            value={familyDetails.noOfBrothers}
+            onChange={(e) => handleChange(e, setFamilyDetails)}
+          />
+
+          <label>No. of Sisters:</label>
+          <input
+            type="number"
+            name="noOfSisters"
+            value={familyDetails.noOfSisters}
+            onChange={(e) => handleChange(e, setFamilyDetails)}
+          />
         </div>
       )}
 
       {step === 5 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h2>Career Details</h2>
-
-          <select
-            value={careerDetails.employedIn}
-            onChange={(e) =>
-              setCareerDetails({
-                ...careerDetails,
-                employedIn: e.target.value,
-              })
-            }
-            required
-          >
-            <option value="">Select Employment Type</option>
-            <option value="Government/PSU">Government/PSU</option>
-            <option value="Defence">Defence</option>
-            <option value="Private">Private</option>
-            <option value="Business">Business</option>
-            <option value="Self Employed">Self Employed</option>
-            <option value="Not Working">Not Working</option>
-          </select>
-
+          <h3>Education Details</h3>
+          <label>
+            Degree:<span style={{ color: "red" }}> *</span>
+          </label>
           <input
             type="text"
-            placeholder="Company Name"
-            value={careerDetails.companyName}
-            onChange={(e) =>
-              setCareerDetails({
-                ...careerDetails,
-                companyName: e.target.value,
-              })
-            }
+            name="degree"
+            value={educationDetails.degree}
+            onChange={(e) => handleChange(e, setEducationDetails)}
+            style={{ borderColor: errors.degree ? "red" : "" }}
           />
+          {errors.degree && <p style={{ color: "red" }}>{errors.degree}</p>}
 
+          <label>College Name:</label>
           <input
             type="text"
-            placeholder="Designation"
-            value={careerDetails.designation}
-            onChange={(e) =>
-              setCareerDetails({
-                ...careerDetails,
-                designation: e.target.value,
-              })
-            }
-            required
+            name="collegeName"
+            value={educationDetails.collegeName}
+            onChange={(e) => handleChange(e, setEducationDetails)}
           />
-
-          <select
-            value={careerDetails.income}
-            onChange={(e) =>
-              setCareerDetails({ ...careerDetails, income: e.target.value })
-            }
-            required
-          >
-            <option value="">Select Income Range</option>
-            <option value="0-2 LPA">0-2 LPA</option>
-            <option value="2-4 LPA">2-4 LPA</option>
-            <option value="4-7 LPA">4-7 LPA</option>
-            <option value="7-10 LPA">7-10 LPA</option>
-            <option value="10-15 LPA">10-15 LPA</option>
-            <option value="15-20 LPA">15-20 LPA</option>
-            <option value="20-25 LPA">20-25 LPA</option>
-            <option value="more than 25 LPA">more than 25 LPA</option>
-          </select>
-          <CustomButton label="Back" onClick={handlePrevious} type="secondary">
-            Back
-          </CustomButton>
-          <CustomButton label="Next" type="primary" onClick={handleNext}>
-            Next
-          </CustomButton>
         </div>
       )}
 
       {step === 6 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h2>Family Details</h2>
+          <h3>Employment Details</h3>
+          <label>
+            Are you employed in:<span style={{ color: "red" }}> *</span>
+          </label>
           <input
             type="text"
-            placeholder="Father's Name"
-            value={familyDetails.fatherName}
-            onChange={(e) =>
-              setFamilyDetails({
-                ...familyDetails,
-                fatherName: e.target.value,
-              })
-            }
-            required
+            name="employeeIn"
+            value={employmentDetails.employeeIn}
+            onChange={(e) => handleChange(e, setEmploymentDetails)}
+            style={{ borderColor: errors.employeeIn ? "red" : "" }}
           />
+          {errors.employeeIn && (
+            <p style={{ color: "red" }}>{errors.employeeIn}</p>
+          )}
+
+          <label>Company Name:</label>
           <input
             type="text"
-            placeholder="Mother's Name"
-            value={familyDetails.motherName}
-            onChange={(e) =>
-              setFamilyDetails({
-                ...familyDetails,
-                motherName: e.target.value,
-              })
-            }
-            required
+            name="companyName"
+            value={employmentDetails.companyName}
+            onChange={(e) => handleChange(e, setEmploymentDetails)}
           />
+
+          <label>Designation:</label>
           <input
             type="text"
-            placeholder="Father's Occupation"
-            value={familyDetails.fatherOccupation}
-            onChange={(e) =>
-              setFamilyDetails({
-                ...familyDetails,
-                fatherOccupation: e.target.value,
-              })
-            }
-            required
+            name="designation"
+            value={employmentDetails.designation}
+            onChange={(e) => handleChange(e, setEmploymentDetails)}
           />
+
+          <label>Income:</label>
           <input
             type="text"
-            placeholder="Mother's Occupation"
-            value={familyDetails.motherOccupation}
-            onChange={(e) =>
-              setFamilyDetails({
-                ...familyDetails,
-                motherOccupation: e.target.value,
-              })
-            }
-            required
+            name="income"
+            value={employmentDetails.income}
+            onChange={(e) => handleChange(e, setEmploymentDetails)}
           />
-          <input
-            type="number"
-            placeholder="Number of Brothers"
-            value={familyDetails.noOfBrothers}
-            onChange={(e) =>
-              setFamilyDetails({
-                ...familyDetails,
-                noOfBrothers: e.target.value,
-              })
-            }
-          />
-          <input
-            type="number"
-            placeholder="Number of Sisters"
-            value={familyDetails.noOfSisters}
-            onChange={(e) =>
-              setFamilyDetails({
-                ...familyDetails,
-                noOfSisters: e.target.value,
-              })
-            }
-          />
-          <CustomButton label="Back" onClick={handlePrevious} type="secondary">
-            Back
-          </CustomButton>
-          <CustomButton label="Next" type="primary" onClick={handleNext}>
-            Next
-          </CustomButton>
         </div>
       )}
 
       {step === 7 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h2>Lifestyle</h2>
-          <select
-            value={lifestyle.diet}
-            onChange={(e) =>
-              setLifestyle({ ...lifestyle, diet: e.target.value })
-            }
-            required
-          >
-            <option value="">Select Diet</option>
-            <option value="veg">Veg</option>
-            <option value="non-veg">Non-Veg</option>
-            <option value="jain">Jain</option>
-            <option value="vegan">Vegan</option>
-            <option value="occasionallyNon-Veg">Occasionally Non-Veg</option>
-          </select>
-          <CustomButton label="Back" onClick={handlePrevious} type="secondary">
-            Back
-          </CustomButton>
-          <CustomButton label="Next" type="primary" onClick={handleNext}>
-            Next
-          </CustomButton>
+          <h3>Address Details</h3>
+          <label>
+            State:<span style={{ color: "red" }}> *</span>
+          </label>
+          <input
+            type="text"
+            name="state"
+            value={address.state}
+            onChange={(e) => handleChange(e, setAddress)}
+            style={{ borderColor: errors.state ? "red" : "" }}
+          />
+          {errors.state && <p style={{ color: "red" }}>{errors.state}</p>}
+
+          <label>
+            District:<span style={{ color: "red" }}> *</span>
+          </label>
+          <input
+            type="text"
+            name="district"
+            value={address.district}
+            onChange={(e) => handleChange(e, setAddress)}
+            style={{ borderColor: errors.district ? "red" : "" }}
+          />
+          {errors.district && <p style={{ color: "red" }}>{errors.district}</p>}
+
+          <label>
+            Residential Address:<span style={{ color: "red" }}> *</span>
+          </label>
+          <textarea
+            name="residentialAddress"
+            value={address.residentialAddress}
+            onChange={(e) => handleChange(e, setAddress)}
+            style={{ borderColor: errors.residentialAddress ? "red" : "" }}
+          />
+          {errors.residentialAddress && (
+            <p style={{ color: "red" }}>{errors.residentialAddress}</p>
+          )}
+
+          <label>
+            Permanent Address:<span style={{ color: "red" }}> *</span>
+          </label>
+          <textarea
+            name="permanentAddress"
+            value={address.permanentAddress}
+            onChange={(e) => handleChange(e, setAddress)}
+            style={{ borderColor: errors.permanentAddress ? "red" : "" }}
+          />
+          {errors.permanentAddress && (
+            <p style={{ color: "red" }}>{errors.permanentAddress}</p>
+          )}
         </div>
       )}
-
       {step === 8 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h2>Contact Information</h2>
-
+          <h3>Social Media Links</h3>
+          <label>Facebook:</label>
           <input
             type="text"
-            placeholder="Contact Number"
-            value={contactInformation.contactNumber}
+            name="facebook"
+            value={socialMedia.facebook}
             onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                contactNumber: e.target.value,
-              })
+              setSocialMedia({ ...socialMedia, facebook: e.target.value })
             }
-            required
+            style={{ borderColor: errors.facebook ? "red" : "" }}
           />
+          {errors.facebook && <p style={{ color: "red" }}>{errors.facebook}</p>}
 
+          <label>LinkedIn:</label>
           <input
             type="text"
-            placeholder="Country"
-            value={contactInformation.address.country}
+            name="linkedin"
+            value={socialMedia.linkedin}
             onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                address: {
-                  ...contactInformation.address,
-                  country: e.target.value,
-                },
-              })
+              setSocialMedia({ ...socialMedia, linkedin: e.target.value })
             }
-            required
+            style={{ borderColor: errors.linkedin ? "red" : "" }}
           />
+          {errors.linkedin && <p style={{ color: "red" }}>{errors.linkedin}</p>}
 
+          <label>Instagram:</label>
           <input
             type="text"
-            placeholder="State"
-            value={contactInformation.address.state}
+            name="instagram"
+            value={socialMedia.instagram}
             onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                address: {
-                  ...contactInformation.address,
-                  state: e.target.value,
-                },
-              })
+              setSocialMedia({ ...socialMedia, instagram: e.target.value })
             }
-            required
+            style={{ borderColor: errors.instagram ? "red" : "" }}
           />
-
-          <input
-            type="text"
-            placeholder="District"
-            value={contactInformation.address.district}
-            onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                address: {
-                  ...contactInformation.address,
-                  district: e.target.value,
-                },
-              })
-            }
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="Residential Address"
-            value={contactInformation.address.residentialAddress}
-            onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                address: {
-                  ...contactInformation.address,
-                  residentialAddress: e.target.value,
-                },
-              })
-            }
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="Permanent Address"
-            value={contactInformation.address.permanentAddress}
-            onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                address: {
-                  ...contactInformation.address,
-                  permanentAddress: e.target.value,
-                },
-              })
-            }
-            required
-          />
-
-          <input
-            type="text"
-            placeholder="LinkedIn URL"
-            value={contactInformation.linkedInUrl}
-            onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                linkedInUrl: e.target.value,
-              })
-            }
-          />
-
-          <input
-            type="text"
-            placeholder="Instagram URL"
-            value={contactInformation.instagramUrl}
-            onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                instagramUrl: e.target.value,
-              })
-            }
-          />
-
-          <input
-            type="text"
-            placeholder="Facebook URL"
-            value={contactInformation.facebookUrl}
-            onChange={(e) =>
-              setContactInformation({
-                ...contactInformation,
-                facebookUrl: e.target.value,
-              })
-            }
-          />
-
-          <CustomButton label="Back" onClick={handlePrevious} type="secondary">
-            Back
-          </CustomButton>
-          <CustomButton label="Next" type="primary" onClick={handleSubmit}>
-            Next
-          </CustomButton>
+          {errors.instagram && (
+            <p style={{ color: "red" }}>{errors.instagram}</p>
+          )}
+        </div>
+      )}
+      {step === 9 && (
+        <div>
+          <h3>Other Details</h3>
+          <label>
+            Diet:<span style={{ color: "red" }}> *</span>
+          </label>
+          <select
+            name="diet"
+            value={diet}
+            onChange={(e) => setDiet(e.target.value)}
+            style={{ borderColor: errors.diet ? "red" : "" }}
+          >
+            <option value="">Select Diet</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="non-vegetarian">Non-Vegetarian</option>
+            <option value="vegan">Vegan</option>
+          </select>
+          {errors.diet && <p style={{ color: "red" }}>{errors.diet}</p>}
         </div>
       )}
 
-      {/* {step === 9 && (
+      {step === 10 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h3>Profile Images (At least 1 required)</h3>
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <PhotoUpload
-                key={index}
-                profileId={"670be21366eb9770ed8867c1"}
-                onUpload={(image) => handleImageUpload(image)}
-              />
-            ))}
-          </div>
-          <CustomButton
-            label="Back"
-            onClick={handlePrevious}
-            type="secondary"
-            disabled={imagePreviews.profileImages.length === 0}
+          <h3>Upload Profile Images</h3>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleImageUpload(e, "profile")}
           />
+          {profileImages.map((image, index) => (
+            <div key={index}>
+              <img
+                src={image.url}
+                alt={`Profile Image ${index + 1}`}
+                width="100"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {step === 11 && (
+        <div>
+          <h3>Upload Kundali Images</h3>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleImageUpload(e, "kundali")}
+          />
+          {kundaliImages.map((image, index) => (
+            <div key={index}>
+              <img
+                src={image.url}
+                alt={`Kundali Image ${index + 1}`}
+                width="100"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div>
+        {step > 1 && (
           <CustomButton
-            label="Next"
-            type="primary"
+            type="button"
+            onClick={handlePrevious}
+            label={"Previous"}
+          ></CustomButton>
+        )}
+        {step < 11 ? (
+          <CustomButton
+            type="button"
             onClick={handleNext}
-            disabled={imagePreviews.profileImages.length < 1}
-          />
-        </div>
-      )}
-
-      {step === 10 && ( // Assuming step 10 is for Kundali upload
-        <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h3>Kundali Images (At least 1 required)</h3>
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
-            {Array.from({ length: 3 }).map((_, index) => (
-              <PhotoUpload
-                key={index}
-                profileId={"670be21366eb9770ed8867c1"}
-                onUpload={(image) => handleKundaliUpload(image)} // Adjust this handler for kundali images
-              />
-            ))}
-          </div>
+            label={"Next"}
+          ></CustomButton>
+        ) : (
           <CustomButton
-            label="Back"
-            onClick={handlePrevious}
-            type="secondary"
-            disabled={imagePreviews.kundaliImages.length === 0} // Ensure the appropriate preview array is used
-          />
-          <CustomButton
-            label="Next"
-            type="primary"
+            type="button"
             onClick={handleSubmit}
-            disabled={imagePreviews.kundaliImages.length < 1} // Ensure at least one image is uploaded
-          />
-        </div>
-      )} */}
-
-      {/* {step === 11 && (
-        <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h3>Preview</h3>
-          <UserPreviewPage />
-        </div>
-      )} */}
+            label={"Submit"}
+          ></CustomButton>
+        )}
+      </div>
     </form>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaPlus } from "react-icons/fa"; // Import the plus icon
+import { FaPlus } from "react-icons/fa";
 import useAuth from "../../context/useAuth";
 import AddProfileCard from "../../components/AddProfileCard";
 import { useNavigate } from "react-router-dom";
@@ -11,14 +11,16 @@ const Profile = () => {
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const userId = user.id
-  console.log('user',user.id)
-const navigate = useNavigate();
+  const userId = user.id; // Assuming the user object contains the user's ID
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchProfiles = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/api/profile/viewProfile");
-        setProfiles(response.data);
+        const response = await axios.get(`/mate/api/v1/profile/get-profile`, {
+          params: { userId }, // Send userId as a query parameter
+        });
+        setProfiles(response.data); // Assuming API returns only profiles for the user
       } catch (error) {
         console.error("Error fetching profiles:", error);
         setError("Could not fetch profiles. Please try again later.");
@@ -28,7 +30,7 @@ const navigate = useNavigate();
     };
 
     fetchProfiles();
-  }, []);
+  }, [userId]);
 
   if (loading) {
     return <div className="text-center mt-5">Loading profiles...</div>;
@@ -38,40 +40,38 @@ const navigate = useNavigate();
     return <div className="text-center text-danger mt-5">{error}</div>;
   }
 
-  const handleClick =()=>{
-    navigate(`/addProfile`)
-  }
+  const handleClick = () => {
+    navigate(`/addProfile`);
+  };
 
   return (
     <div className="container my-5">
-      <Navbar/>
+      <Navbar />
+      <div>
+        {user ? (
           <div>
-      {user ? (
-        <div>
-          <h1>Welcome, {user.firstName}!</h1>
-          <p>Email: {user.email}</p>
-          {/* Add more user details as needed */}
+            <h1>Welcome, {user.firstName}!</h1>
+            <p>Email: {user.email}</p>
+          </div>
+        ) : (
+          <p>Please log in to see your profile.</p>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <h1 className="text-center mb-4">Profiles</h1>
+        <div
+          className="cursor-pointer mb-4 d-flex align-items-center justify-content-center bg-blue-500 text-white rounded-pill p-3 shadow btn btn-success"
+          onClick={handleClick}
+        >
+          <FaPlus className="mr-2" /> Create New Profile
         </div>
-      ) : (
-        <p>Please log in to see your profile.</p>
-      )}
-    </div>
-
-      <div style={{display:'flex', justifyContent:'space-between'}}>
-      <h1 className="text-center mb-4">Profiles</h1>
-
-      <div
-        className="cursor-pointer mb-4 d-flex align-items-center justify-content-center bg-blue-500 text-white rounded-pill p-3 shadow btn btn-success"
-        onClick={handleClick}
-        
-      >
-        <FaPlus className="mr-2" /> Create New Profile
       </div>
-      </div>
+
       <div className="row">
         {profiles.length > 0 ? (
           profiles.map((profile) => (
-            <div className="col-md-4 mb-4" key={userId}>
+            <div className="col-md-4 mb-4" key={profile.id}>
               <AddProfileCard
                 userId={userId}
                 name={`${profile.personalDetails?.firstName || "N/A"} ${profile.personalDetails?.lastName || "N/A"}`}
@@ -87,8 +87,6 @@ const navigate = useNavigate();
             <p>No profiles available.</p>
           </div>
         )}
-
-        
       </div>
     </div>
   );
