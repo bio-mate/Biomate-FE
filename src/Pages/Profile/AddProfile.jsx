@@ -151,6 +151,7 @@ const AddProfile = () => {
     if (validateFields()) {
       setStep(step + 1);
     }
+    console.log("step", step);
   };
 
   const handlePrevious = () => setStep(step - 1);
@@ -219,24 +220,23 @@ const AddProfile = () => {
       setKundaliImages(newImages);
     }
   };
-
+  const titles = [
+    "Personal",
+    "Religious",
+    "Astro",
+    "Family",
+    "Edu & Career",
+    "Lifestyle",
+    "Contact",
+    "Upload Photo",
+    "Upload Photo",
+    "Upload Photo",
+  ];
   return (
     <form onSubmit={handleSubmit}>
-      <ProgressBar
-        currentStep={step}
-        titles={[
-          "Personal",
-          "Religious",
-          "Astro",
-          "Family",
-          "Education",
-          "Employment",
-          "Other",
-        ]}
-      />
-
       {step === 1 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Personal Details</h3>
           <label>
             First Name:<span style={{ color: "red" }}> *</span>
@@ -352,6 +352,7 @@ const AddProfile = () => {
 
       {step === 2 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Religious Details</h3>
           <label>
             Caste:<span style={{ color: "red" }}> *</span>
@@ -397,6 +398,7 @@ const AddProfile = () => {
 
       {step === 3 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Astro Details</h3>
           <label>
             Date of Birth:<span style={{ color: "red" }}> *</span>
@@ -450,6 +452,7 @@ const AddProfile = () => {
 
       {step === 4 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Family Details</h3>
           <label>
             Father's Name:<span style={{ color: "red" }}> *</span>
@@ -517,6 +520,7 @@ const AddProfile = () => {
 
       {step === 5 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Education Details</h3>
           <label>
             Degree:<span style={{ color: "red" }}> *</span>
@@ -542,6 +546,7 @@ const AddProfile = () => {
 
       {step === 6 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Employment Details</h3>
           <label>
             Are you employed in:<span style={{ color: "red" }}> *</span>
@@ -585,6 +590,7 @@ const AddProfile = () => {
 
       {step === 7 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Address Details</h3>
           <label>
             State:<span style={{ color: "red" }}> *</span>
@@ -639,6 +645,7 @@ const AddProfile = () => {
       )}
       {step === 8 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Social Media Links</h3>
           <label>Facebook:</label>
           <input
@@ -681,6 +688,7 @@ const AddProfile = () => {
       )}
       {step === 9 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Other Details</h3>
           <label>
             Diet:<span style={{ color: "red" }}> *</span>
@@ -702,6 +710,7 @@ const AddProfile = () => {
 
       {step === 10 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Upload Profile Images</h3>
           <input
             type="file"
@@ -723,6 +732,7 @@ const AddProfile = () => {
 
       {step === 11 && (
         <div>
+          <ProgressBar currentStep={step} titles={titles} />
           <h3>Upload Kundali Images</h3>
           <input
             type="file"
