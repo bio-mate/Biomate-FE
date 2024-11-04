@@ -20,7 +20,8 @@ import {
   incomeOptions,
   employeeInOptions,
 } from "../../constant/constant";
-import PhotoUpload from "../../Atoms/PhotoUpload";
+
+import "../../styles/PhotoUpload.css";
 const AddProfile = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
@@ -277,8 +278,12 @@ const AddProfile = () => {
 
   const handleImageUpload = (e, type) => {
     const files = Array.from(e.target.files);
-    console.log("files", files);
-    const newImages = files.map((file) => ({
+
+    // Filter files that are within the 3MB size limit
+    const filteredFiles = files.filter((file) => file.size <= 3 * 1024 * 1024);
+
+    // Map the files to include additional information for preview
+    const newImages = filteredFiles.map((file) => ({
       url: URL.createObjectURL(file), // For previewing
       lastModified: file.lastModified,
       lastModifiedDate: file.lastModifiedDate,
@@ -287,11 +292,28 @@ const AddProfile = () => {
       type: file.type,
       status: 1, // Default status
     }));
-    console.log("newImages", newImages);
+
     if (type === "profile") {
-      setProfileImages(newImages);
+      // Append new images to existing profile images, limiting to 6 total
+      setProfileImages((prevImages) => [
+        ...prevImages,
+        ...newImages.slice(0, 6 - prevImages.length),
+      ]);
     } else if (type === "kundali") {
-      setKundaliImages(newImages);
+      // Append new images to existing kundali images, limiting to 2 total
+      setKundaliImages((prevImages) => [
+        ...prevImages,
+        ...newImages.slice(0, 2 - prevImages.length),
+      ]);
+    }
+  };
+
+  // Handler to remove an image
+  const handleRemoveImage = (index, type) => {
+    if (type === "profile") {
+      setProfileImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setKundaliImages((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -890,43 +912,67 @@ const AddProfile = () => {
         </div>
       )}
       {/* Upload Profile Images */}
+
       {step === 16 && (
         <div>
-          <img
-            src="/profile.png"
-            alt="Male"
-            style={{ width: "50px", marginBottom: "20px" }}
-          />
-
-          <div style={{ display: "flex", flexWrap: "wrap" }}>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <PhotoUpload
-                key={index}
-                profileId={"670be21366eb9770ed8867c1"}
-                onUpload={(image) => handleImageUpload(image)}
-              />
+          <h3>Upload Profile Images</h3>
+          <div className="image-upload-grid">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="image-box">
+                {profileImages[index] ? (
+                  <div className="image-preview">
+                    <img
+                      src={profileImages[index].url}
+                      alt={`Profile ${index + 1}`}
+                    />
+                    <button onClick={() => handleRemoveImage(index, "profile")}>
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <label className="upload-placeholder">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, "profile")}
+                    />
+                    <span>+</span>
+                  </label>
+                )}
+              </div>
             ))}
           </div>
-          <p>Profile Images (At least 1 required)</p>
         </div>
       )}
+      
       {/* Kundali Images */}
       {step === 17 && (
         <div>
-          <img
-            src="/kundali.png"
-            alt="Male"
-            style={{ width: "50px", marginBottom: "20px" }}
-          />
           <h3>Upload Kundali Images</h3>
-          
-         <div style={{ display: "flex", flexWrap: "wrap" }}>
-            {Array.from({ length: 3 }).map((_, index) => (
-              <PhotoUpload
-                key={index}
-                profileId={"670be21366eb9770ed8867c1"}
-                onUpload={(image) => handleImageUpload(image)}
-              />
+          <div className="image-upload-grid">
+            {[...Array(2)].map((_, index) => (
+              <div key={index} className="image-box">
+                {kundaliImages[index] ? (
+                  <div className="image-preview">
+                    <img
+                      src={kundaliImages[index].url}
+                      alt={`Kundali ${index + 1}`}
+                    />
+                    <button onClick={() => handleRemoveImage(index, "kundali")}>
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <label className="upload-placeholder">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, "kundali")}
+                    />
+                    <span>+</span>
+                  </label>
+                )}
+              </div>
             ))}
           </div>
         </div>
