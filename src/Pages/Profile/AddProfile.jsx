@@ -3,10 +3,43 @@ import { useNavigate } from "react-router-dom";
 import CustomButton from "../../Atoms/CustomButton";
 import ProgressBar from "../../Atoms/ProgressBar";
 import axios from "axios";
-
+import styled from "styled-components";
+import "../../styles/InputField.css";
+import IconRadioGroup from "../../components/IconRadioGroup";
+import TextInput from "../../components/TextInput";
+import DropdownInput from "../../components/DropdownInput";
+import {
+  titles,
+  complexions,
+  bloodGroups,
+  genderOptions,
+  religionOptions,
+  rashiOptions,
+  nakshatraOptions,
+  gotraOptions,
+  incomeOptions,
+  employeeInOptions,
+} from "../../constant/constant";
 const AddProfile = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+
+  const Header = styled.div`
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between; /* Align items to edges */
+    margin-bottom: 1rem;
+  `;
+
+  const Footer = styled.div`
+    position: fixed;
+    bottom: 20px;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `;
 
   // States for each section
   const [personalDetails, setPersonalDetails] = useState({
@@ -33,7 +66,7 @@ const AddProfile = () => {
     pob: "",
     tob: "",
     rashi: "",
-    nakshtra: "",
+    nakshatra: "",
   });
 
   const [familyDetails, setFamilyDetails] = useState({
@@ -79,59 +112,99 @@ const AddProfile = () => {
   const [diet, setDiet] = useState("");
   const [errors, setErrors] = useState({});
 
-  // Validator function
-  const validateFields = () => {
-    const newErrors = {};
+  // const validateFields = () => {
+  //   const newErrors = {};
 
-    if (step === 1) {
-      if (!personalDetails.first_name.trim())
-        newErrors.first_name = "First name is required.";
-      if (!personalDetails.middle_name.trim())
-        newErrors.middle_name = "Middle name is required.";
-      if (!personalDetails.last_name.trim())
-        newErrors.last_name = "Last name is required.";
-      if (!personalDetails.age || personalDetails.age < 18)
-        newErrors.age = "Age must be 18 or older.";
-      if (!personalDetails.gender) newErrors.gender = "Gender is required.";
-    }
+  //   // Step 1: Personal Details Validation
+  //   if (step === 1) {
+  //     if (!personalDetails.first_name.trim())
+  //       newErrors.first_name = "First name is required.";
+  //     if (!personalDetails.middle_name.trim())
+  //       newErrors.middle_name = "Middle name is required.";
+  //     if (!personalDetails.last_name.trim())
+  //       newErrors.last_name = "Last name is required.";
+  //     if (!personalDetails.age || personalDetails.age < 18)
+  //       newErrors.age = "Age must be 18 or older.";
+  //     // if (!personalDetails.gender) newErrors.gender = "Gender is required.";
+  //   }
 
-    if (step === 2) {
-      if (!religiousDetails.caste.trim())
-        newErrors.caste = "Caste is required.";
-      if (!religiousDetails.subCaste.trim())
-        newErrors.subCaste = "Sub caste is required.";
-    }
+  //   // Step 2: Religious Details Validation
+  //   if (step === 2) {
+  //     if (!religiousDetails.caste.trim())
+  //       newErrors.caste = "Caste is required.";
+  //     if (!religiousDetails.subCaste.trim())
+  //       newErrors.subCaste = "Sub caste is required.";
+  //   }
 
-    if (step === 3) {
-      if (!astroDetails.dob) newErrors.dob = "Date of birth is required.";
-      if (!astroDetails.pob.trim())
-        newErrors.pob = "Place of birth is required.";
-    }
+  //   // Step 3: Astrological Details Validation
+  //   if (step === 3) {
+  //     if (!astroDetails.dob) newErrors.dob = "Date of birth is required.";
+  //     if (!astroDetails.pob.trim())
+  //       newErrors.pob = "Place of birth is required.";
+  //   }
 
-    if (step === 4) {
-      if (!familyDetails.fatherName.trim())
-        newErrors.fatherName = "Father's name is required.";
-    }
+  //   // Step 4: Family Details Validation
+  //   if (step === 4) {
+  //     if (!familyDetails.fatherName.trim())
+  //       newErrors.fatherName = "Father's name is required.";
+  //   }
 
-    if (step === 5) {
-      if (!educationDetails.degree.trim())
-        newErrors.degree = "Degree is required.";
-    }
+  //   // Step 5: Education Details Validation
+  //   if (step === 5) {
+  //     if (!educationDetails.degree.trim())
+  //       newErrors.degree = "Degree is required.";
+  //   }
 
-    if (step === 6) {
-      if (!employmentDetails.employeeIn.trim())
-        newErrors.employeeIn = "Employment status is required.";
-    }
+  //   // Step 6: Employment Details Validation
+  //   if (step === 6) {
+  //     if (!employmentDetails.employeeIn.trim())
+  //       newErrors.employeeIn = "Employment status is required.";
+  //   }
 
-    if (step === 7) {
-      if (!diet) newErrors.diet = "Diet preference is required.";
-    }
+  //   // Step 7: Address Details Validation
+  //   if (step === 7) {
+  //     if (!address.state.trim()) newErrors.state = "State is required.";
+  //     if (!address.district.trim())
+  //       newErrors.district = "District is required.";
+  //     if (!address.residentialAddress.trim())
+  //       newErrors.residentialAddress = "Residential address is required.";
+  //     if (!address.permanentAddress.trim())
+  //       newErrors.permanentAddress = "Permanent address is required.";
+  //   }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  //   // Step 8: Social Media Validation
+  //   if (step === 8) {
+  //     if (!socialMedia.facebook.trim())
+  //       newErrors.facebook = "Facebook link is required.";
+  //     if (!socialMedia.linkedin.trim())
+  //       newErrors.linkedin = "LinkedIn link is required.";
+  //     if (!socialMedia.instagram.trim())
+  //       newErrors.instagram = "Instagram link is required.";
+  //   }
+
+  //   // Step 9: Diet Preference Validation
+  //   if (step === 9) {
+  //     if (!diet) newErrors.diet = "Diet preference is required.";
+  //   }
+
+  //   // Step 10: Profile Images Validation
+  //   if (step === 10) {
+  //     if (profileImages.length === 0)
+  //       newErrors.profileImages = "At least one profile image is required.";
+  //   }
+
+  //   // Step 11: Kundali Images Validation
+  //   if (step === 11) {
+  //     if (kundaliImages.length === 0)
+  //       newErrors.kundaliImages = "At least one kundali image is required.";
+  //   }
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
 
   // Handler for updating input fields
+
   const handleChange = (e, setState) => {
     const { name, value } = e.target;
     setState((prevDetails) => ({
@@ -148,9 +221,9 @@ const AddProfile = () => {
 
   // Navigate through steps
   const handleNext = () => {
-    if (validateFields()) {
-      setStep(step + 1);
-    }
+    // if (validateFields()) {
+    setStep(step + 1);
+    // }
     console.log("step", step);
   };
 
@@ -220,140 +293,168 @@ const AddProfile = () => {
       setKundaliImages(newImages);
     }
   };
-  const titles = [
-    "Personal",
-    "Religious",
-    "Astro",
-    "Family",
-    "Edu & Career",
-    "Lifestyle",
-    "Contact",
-    "Upload Photo",
-    "Upload Photo",
-    "Upload Photo",
-  ];
+
+  const handleComplexionSelect = (complexion) => {
+    setPersonalDetails({ ...personalDetails, complexion });
+  };
+
+  const handleBloodGroupSelect = (blood_group) => {
+    setPersonalDetails({ ...personalDetails, blood_group });
+  };
+  const handleGenderSelect = (gender) => {
+    setPersonalDetails({ ...personalDetails, gender });
+    console.log("gender", gender);
+  };
+
   return (
     <form onSubmit={handleSubmit}>
+      {step > 1 && (
+        <Header>
+          <div onClick={handlePrevious}>
+            <img src="/back.png" alt="Male" style={{ width: "30px" }} />
+          </div>
+          <ProgressBar currentStep={step} titles={titles} />
+        </Header>
+      )}
       {step === 1 && (
         <div>
           <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Personal Details</h3>
-          <label>
-            First Name:<span style={{ color: "red" }}> *</span>
-          </label>
-          <input
-            type="text"
+          <TextInput
+            label="First Name"
             name="first_name"
             value={personalDetails.first_name}
             onChange={(e) => handleChange(e, setPersonalDetails)}
-            style={{ borderColor: errors.first_name ? "red" : "" }}
+            error={errors.first_name}
+            required
           />
-          {errors.first_name && (
-            <p style={{ color: "red" }}>{errors.first_name}</p>
-          )}
-
-          <label>
-            Middle Name:<span style={{ color: "red" }}> *</span>
-          </label>
-          <input
-            type="text"
+          <TextInput
+            label="Middle Name"
             name="middle_name"
             value={personalDetails.middle_name}
             onChange={(e) => handleChange(e, setPersonalDetails)}
-            style={{ borderColor: errors.middle_name ? "red" : "" }}
           />
-          {errors.middle_name && (
-            <p style={{ color: "red" }}>{errors.middle_name}</p>
-          )}
-
-          <label>
-            Last Name:<span style={{ color: "red" }}> *</span>
-          </label>
-          <input
-            type="text"
+          <TextInput
+            label="Last Name"
             name="last_name"
             value={personalDetails.last_name}
             onChange={(e) => handleChange(e, setPersonalDetails)}
-            style={{ borderColor: errors.last_name ? "red" : "" }}
-          />
-          {errors.last_name && (
-            <p style={{ color: "red" }}>{errors.last_name}</p>
-          )}
-
-          <label>
-            Age:<span style={{ color: "red" }}> *</span>
-          </label>
-          <input
-            type="number"
-            name="age"
-            value={personalDetails.age}
-            onChange={(e) => handleChange(e, setPersonalDetails)}
-            style={{ borderColor: errors.age ? "red" : "" }}
-          />
-          {errors.age && <p style={{ color: "red" }}>{errors.age}</p>}
-
-          <label>
-            Gender:<span style={{ color: "red" }}> *</span>
-          </label>
-          <select
-            name="gender"
-            value={personalDetails.gender}
-            onChange={(e) => handleChange(e, setPersonalDetails)}
-            style={{ borderColor: errors.gender ? "red" : "" }}
-          >
-            <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-          {errors.gender && <p style={{ color: "red" }}>{errors.gender}</p>}
-
-          <label>Blood Group:</label>
-          <select
-            name="blood_group"
-            value={personalDetails.blood_group}
-            onChange={(e) => handleChange(e, setPersonalDetails)}
-          >
-            <option value="">Select Blood Group</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="O+">O+</option>
-            <option value="O-">O-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-          </select>
-
-          <label>Complexion:</label>
-          <input
-            type="text"
-            name="complexion"
-            value={personalDetails.complexion}
-            onChange={(e) => handleChange(e, setPersonalDetails)}
-          />
-
-          <label>Height:</label>
-          <input
-            type="text"
-            name="height"
-            value={personalDetails.height}
-            onChange={(e) => handleChange(e, setPersonalDetails)}
-          />
-
-          <label>Weight:</label>
-          <input
-            type="text"
-            name="weight"
-            value={personalDetails.weight}
-            onChange={(e) => handleChange(e, setPersonalDetails)}
+            error={errors.last_name}
+            required
           />
         </div>
       )}
-
       {step === 2 && (
+        <>
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <div>
+            <label>
+              Age:<span style={{ color: "red" }}> *</span>
+            </label>
+            <input
+              type="number"
+              name="age"
+              value={personalDetails.age}
+              onChange={(e) => handleChange(e, setPersonalDetails)}
+              style={{ borderColor: errors.age ? "red" : "" }}
+            />
+            {errors.age && <p style={{ color: "red" }}>{errors.age}</p>}
+          </div>
+        </>
+      )}
+      {step === 3 && (
+        <>
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <div>
+            <label>Height:</label>
+            <input
+              type="text"
+              name="height"
+              value={personalDetails.height}
+              onChange={(e) => handleChange(e, setPersonalDetails)}
+            />
+          </div>
+        </>
+      )}
+      {step === 4 && (
+        <>
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <div>
+            <label>Weight:</label>
+            <input
+              type="text"
+              name="weight"
+              value={personalDetails.weight}
+              onChange={(e) => handleChange(e, setPersonalDetails)}
+            />
+          </div>
+        </>
+      )}
+
+      {step === 5 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <IconRadioGroup
+            label="Select Gender"
+            options={genderOptions}
+            selectedValue={personalDetails.gender}
+            onChange={handleGenderSelect}
+            error={errors.gender}
+          />
+        </div>
+      )}
+      {step === 6 && (
+        <div>
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <div>
+            <IconRadioGroup
+              label="Select Complexion"
+              options={complexions}
+              selectedValue={personalDetails.complexion}
+              onChange={handleComplexionSelect}
+              error={errors.gender}
+            />
+          </div>
+
+          <input type="hidden" value={personalDetails.complexion} required />
+        </div>
+      )}
+      {step === 7 && (
+        <div>
+          <img
+            src="/gender.png"
+            alt="Blood Group Icon"
+            style={{ width: "150px" }}
+          />
+          <h3>Select Blood Group</h3>
+          <p>Please Select your Blood Group</p>
+          <div style={{ marginBottom: "10px" }}>
+            <IconRadioGroup
+              label="Blood Groups"
+              options={bloodGroups}
+              selectedValue={personalDetails.blood_group}
+              onChange={handleBloodGroupSelect}
+              error={errors.blood_group} // Use the appropriate error for blood group
+            />
+          </div>
+          <input type="hidden" value={personalDetails.blood_group} required />
+        </div>
+      )}
+      {step === 8 && (
+        <div>
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Religious Details</h3>
+          <DropdownInput
+            label="Select Religion"
+            name="religion"
+            value={religiousDetails.religion}
+            onChange={handleChange}
+            options={religionOptions}
+            error={errors.religion}
+            required
+          />
+
           <label>
             Caste:<span style={{ color: "red" }}> *</span>
           </label>
@@ -378,7 +479,7 @@ const AddProfile = () => {
           />
           {errors.subCaste && <p style={{ color: "red" }}>{errors.subCaste}</p>}
 
-          <label>Language:</label>
+          <label>Mother Tongue:</label>
           <input
             type="text"
             name="language"
@@ -386,19 +487,20 @@ const AddProfile = () => {
             onChange={(e) => handleChange(e, setReligiousDetails)}
           />
 
-          <label>Gotra:</label>
-          <input
-            type="text"
+          <DropdownInput
+            label="Select Gotra"
             name="gotra"
             value={religiousDetails.gotra}
             onChange={(e) => handleChange(e, setReligiousDetails)}
+            options={gotraOptions}
+            error={errors.gotra}
           />
         </div>
       )}
 
-      {step === 3 && (
+      {step === 9 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Astro Details</h3>
           <label>
             Date of Birth:<span style={{ color: "red" }}> *</span>
@@ -432,95 +534,115 @@ const AddProfile = () => {
             onChange={(e) => handleChange(e, setAstroDetails)}
           />
 
-          <label>Rashi:</label>
-          <input
-            type="text"
+          <DropdownInput
+            label="Select Rashi"
             name="rashi"
             value={astroDetails.rashi}
             onChange={(e) => handleChange(e, setAstroDetails)}
+            options={rashiOptions}
+            error={errors.rashi}
           />
-
-          <label>Nakshtra:</label>
-          <input
-            type="text"
-            name="nakshtra"
-            value={astroDetails.nakshtra}
+          <DropdownInput
+            label="Select Nakshatra"
+            name="nakshatra"
+            value={astroDetails.nakshatra}
             onChange={(e) => handleChange(e, setAstroDetails)}
+            options={nakshatraOptions}
+            error={errors.nakshatra}
           />
         </div>
       )}
-
-      {step === 4 && (
+      {/* Family Details */}
+      {step === 10 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Family Details</h3>
-          <label>
-            Father's Name:<span style={{ color: "red" }}> *</span>
-          </label>
-          <input
-            type="text"
+
+          <TextInput
+            label="Father's Name"
             name="fatherName"
             value={familyDetails.fatherName}
             onChange={(e) => handleChange(e, setFamilyDetails)}
-            style={{ borderColor: errors.fatherName ? "red" : "" }}
+            error={errors.fatherName}
+            required
           />
-          {errors.fatherName && (
-            <p style={{ color: "red" }}>{errors.fatherName}</p>
-          )}
 
-          <label>Mother's Name:</label>
-          <input
-            type="text"
+          <TextInput
+            label="Mother's Name"
             name="motherName"
             value={familyDetails.motherName}
             onChange={(e) => handleChange(e, setFamilyDetails)}
           />
 
-          <label>Brother's Name:</label>
-          <input
-            type="text"
-            name="brotherName"
-            value={familyDetails.brotherName}
-            onChange={(e) => handleChange(e, setFamilyDetails)}
-          />
-
-          <label>Father's Occupation:</label>
-          <input
-            type="text"
+          <TextInput
+            label="Father's Occupation"
             name="fatherOccupation"
             value={familyDetails.fatherOccupation}
             onChange={(e) => handleChange(e, setFamilyDetails)}
           />
 
-          <label>Mother's Occupation:</label>
-          <input
-            type="text"
+          <TextInput
+            label="Mother's Occupation"
             name="motherOccupation"
             value={familyDetails.motherOccupation}
             onChange={(e) => handleChange(e, setFamilyDetails)}
           />
 
-          <label>No. of Brothers:</label>
-          <input
-            type="number"
+          <TextInput
+            label="No. of Brothers"
             name="noOfBrothers"
+            type="number" // Assuming TextInput can handle type
             value={familyDetails.noOfBrothers}
             onChange={(e) => handleChange(e, setFamilyDetails)}
           />
 
-          <label>No. of Sisters:</label>
-          <input
-            type="number"
+          <TextInput
+            label="No. of Sisters"
             name="noOfSisters"
+            type="number" // Assuming TextInput can handle type
             value={familyDetails.noOfSisters}
             onChange={(e) => handleChange(e, setFamilyDetails)}
           />
+
+          {familyDetails.noOfBrothers >= 1 && (
+            <>
+              <label>Brother's Name:</label>
+              {Array.from({ length: familyDetails.noOfBrothers }).map(
+                (_, index) => (
+                  <TextInput
+                    key={`brother-${index}`}
+                    label={`Brother's Name ${index + 1}`}
+                    name={`brotherName${index + 1}`} // Unique name for each input
+                    value={familyDetails[`brotherName${index + 1}`] || ""} // Handle state
+                    onChange={(e) => handleChange(e, setFamilyDetails)}
+                  />
+                )
+              )}
+            </>
+          )}
+
+          {familyDetails.noOfSisters >= 1 && (
+            <>
+              <label>Sister's Name:</label>
+              {Array.from({ length: familyDetails.noOfSisters }).map(
+                (_, index) => (
+                  <TextInput
+                    key={`sister-${index}`}
+                    label={`Sister's Name ${index + 1}`}
+                    name={`sisterName${index + 1}`} // Unique name for each input
+                    value={familyDetails[`sisterName${index + 1}`] || ""} // Handle state
+                    onChange={(e) => handleChange(e, setFamilyDetails)}
+                  />
+                )
+              )}
+            </>
+          )}
         </div>
       )}
-
-      {step === 5 && (
+      {/* Education Details */}
+      {step === 11 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Education Details</h3>
           <label>
             Degree:<span style={{ color: "red" }}> *</span>
@@ -543,24 +665,19 @@ const AddProfile = () => {
           />
         </div>
       )}
-
-      {step === 6 && (
+      {/* Employment Details */}
+      {step === 12 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Employment Details</h3>
-          <label>
-            Are you employed in:<span style={{ color: "red" }}> *</span>
-          </label>
-          <input
-            type="text"
+          <DropdownInput
+            label="Are you employed in:"
             name="employeeIn"
             value={employmentDetails.employeeIn}
             onChange={(e) => handleChange(e, setEmploymentDetails)}
-            style={{ borderColor: errors.employeeIn ? "red" : "" }}
+            options={employeeInOptions}
+            error={errors.employeeIn}
           />
-          {errors.employeeIn && (
-            <p style={{ color: "red" }}>{errors.employeeIn}</p>
-          )}
 
           <label>Company Name:</label>
           <input
@@ -578,19 +695,20 @@ const AddProfile = () => {
             onChange={(e) => handleChange(e, setEmploymentDetails)}
           />
 
-          <label>Income:</label>
-          <input
-            type="text"
+          <DropdownInput
+            label="Select Income Range"
             name="income"
-            value={employmentDetails.income}
-            onChange={(e) => handleChange(e, setEmploymentDetails)}
+            value={employmentDetails.income} // Make sure this is the correct state
+            onChange={(e) => handleChange(e, setEmploymentDetails)} // Ensure setEmploymentDetails is used
+            options={incomeOptions} // Your salary options array
+            error={errors.income} // Error handling for salary
           />
         </div>
       )}
 
-      {step === 7 && (
+      {step === 13 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Address Details</h3>
           <label>
             State:<span style={{ color: "red" }}> *</span>
@@ -643,9 +761,9 @@ const AddProfile = () => {
           )}
         </div>
       )}
-      {step === 8 && (
+      {step === 14 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Social Media Links</h3>
           <label>Facebook:</label>
           <input
@@ -686,10 +804,10 @@ const AddProfile = () => {
           )}
         </div>
       )}
-      {step === 9 && (
+      {step === 15 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
-          <h3>Other Details</h3>
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <h3>Lifestyle Details</h3>
           <label>
             Diet:<span style={{ color: "red" }}> *</span>
           </label>
@@ -708,9 +826,9 @@ const AddProfile = () => {
         </div>
       )}
 
-      {step === 10 && (
+      {step === 16 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Upload Profile Images</h3>
           <input
             type="file"
@@ -730,9 +848,9 @@ const AddProfile = () => {
         </div>
       )}
 
-      {step === 11 && (
+      {step === 17 && (
         <div>
-          <ProgressBar currentStep={step} titles={titles} />
+          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
           <h3>Upload Kundali Images</h3>
           <input
             type="file"
@@ -753,26 +871,21 @@ const AddProfile = () => {
       )}
 
       <div>
-        {step > 1 && (
-          <CustomButton
-            type="button"
-            onClick={handlePrevious}
-            label={"Previous"}
-          ></CustomButton>
-        )}
-        {step < 11 ? (
-          <CustomButton
-            type="button"
-            onClick={handleNext}
-            label={"Next"}
-          ></CustomButton>
-        ) : (
-          <CustomButton
-            type="button"
-            onClick={handleSubmit}
-            label={"Submit"}
-          ></CustomButton>
-        )}
+        <Footer>
+          {step < 17 ? (
+            <CustomButton
+              type="primary"
+              onClick={handleNext}
+              label={"Next"}
+            ></CustomButton>
+          ) : (
+            <CustomButton
+              type="primary"
+              onClick={handleSubmit}
+              label={"Submit"}
+            ></CustomButton>
+          )}
+        </Footer>
       </div>
     </form>
   );

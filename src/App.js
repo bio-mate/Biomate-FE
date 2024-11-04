@@ -13,6 +13,7 @@ import Profile from "./Pages/Profile/Profile";
 import Register from "./Pages/Login/Register";
 import AddProfile from "./Pages/Profile/AddProfile";
 import { UserProvider } from "./context/userContext";
+import Main from "./Pages/Login/Main";
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
         <div>
           <Routes>
             {/* Login */}
+            <Route path="/" element={<Main />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
 
