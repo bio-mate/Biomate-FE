@@ -2,9 +2,10 @@
 import React, { useState } from "react";
 import { fetchData } from "../../utils/api";
 import { ToastContainer, toast } from "react-toastify";
+import CustomButton from "../../Atoms/CustomButton";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import styled from "styled-components";
 const Register = () => {
   const [formData, setFormData] = useState({
     mobile: "",
@@ -13,7 +14,14 @@ const Register = () => {
     district: "",
   });
   const [errors, setErrors] = useState({});
-
+  const Footer = styled.div`
+    position: fixed;
+    bottom: 20px;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `;
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -57,9 +65,16 @@ const Register = () => {
       <ToastContainer />
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <h3 className="text-center">Register</h3>
-          <form onSubmit={handleSubmit} className="p-4 border rounded bg-light">
+          
+          <form onSubmit={handleSubmit} className="p-4">
             <div className="mb-3">
+            <img
+            src="/smartphone.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
+            <h3>Register</h3>
+           
               <label htmlFor="mobile" className="form-label">
                 Mobile Number
               </label>
@@ -125,9 +140,11 @@ const Register = () => {
                 <div className="invalid-feedback">{errors.district}</div>
               )}
             </div>
-            <button type="submit" className="btn btn-primary w-100">
-              Register
-            </button>
+            <Footer>
+              <CustomButton type="primary" label={"Register"} className="btn btn-primary w-100">
+                
+              </CustomButton>
+            </Footer>
           </form>
         </div>
       </div>

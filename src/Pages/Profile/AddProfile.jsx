@@ -20,6 +20,7 @@ import {
   incomeOptions,
   employeeInOptions,
 } from "../../constant/constant";
+import PhotoUpload from "../../Atoms/PhotoUpload";
 const AddProfile = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
@@ -316,10 +317,15 @@ const AddProfile = () => {
           <ProgressBar currentStep={step} titles={titles} />
         </Header>
       )}
+      {/* personal details */}
       {step === 1 && (
         <div>
           <ProgressBar currentStep={step} titles={titles} />
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/user.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Personal Details</h3>
           <TextInput
             label="First Name"
@@ -345,9 +351,14 @@ const AddProfile = () => {
           />
         </div>
       )}
+      {/* age */}
       {step === 2 && (
         <>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/age.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <div>
             <label>
               Age:<span style={{ color: "red" }}> *</span>
@@ -363,9 +374,14 @@ const AddProfile = () => {
           </div>
         </>
       )}
+      {/* height */}
       {step === 3 && (
         <>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/height.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <div>
             <label>Height:</label>
             <input
@@ -377,9 +393,14 @@ const AddProfile = () => {
           </div>
         </>
       )}
+      {/* weight */}
       {step === 4 && (
         <>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/weight.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <div>
             <label>Weight:</label>
             <input
@@ -391,10 +412,14 @@ const AddProfile = () => {
           </div>
         </>
       )}
-
+      {/* gender */}
       {step === 5 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/gender.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <IconRadioGroup
             label="Select Gender"
             options={genderOptions}
@@ -404,9 +429,14 @@ const AddProfile = () => {
           />
         </div>
       )}
+      {/* Complexion */}
       {step === 6 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/skin-care.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <div>
             <IconRadioGroup
               label="Select Complexion"
@@ -420,15 +450,14 @@ const AddProfile = () => {
           <input type="hidden" value={personalDetails.complexion} required />
         </div>
       )}
+      {/* Blood Group */}
       {step === 7 && (
         <div>
           <img
-            src="/gender.png"
+            src="/blood.png"
             alt="Blood Group Icon"
-            style={{ width: "150px" }}
+            style={{ width: "50px", marginBottom: "20px" }}
           />
-          <h3>Select Blood Group</h3>
-          <p>Please Select your Blood Group</p>
           <div style={{ marginBottom: "10px" }}>
             <IconRadioGroup
               label="Blood Groups"
@@ -441,9 +470,14 @@ const AddProfile = () => {
           <input type="hidden" value={personalDetails.blood_group} required />
         </div>
       )}
+      {/* Religious Details */}
       {step === 8 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/pray.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Religious Details</h3>
           <DropdownInput
             label="Select Religion"
@@ -497,10 +531,14 @@ const AddProfile = () => {
           />
         </div>
       )}
-
+      {/* Astro Details */}
       {step === 9 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/astrology.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Astro Details</h3>
           <label>
             Date of Birth:<span style={{ color: "red" }}> *</span>
@@ -555,7 +593,11 @@ const AddProfile = () => {
       {/* Family Details */}
       {step === 10 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/family.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Family Details</h3>
 
           <TextInput
@@ -604,7 +646,7 @@ const AddProfile = () => {
             onChange={(e) => handleChange(e, setFamilyDetails)}
           />
 
-          {familyDetails.noOfBrothers >= 1 && (
+          {/* {familyDetails.noOfBrothers >= 1 && (
             <>
               <label>Brother's Name:</label>
               {Array.from({ length: familyDetails.noOfBrothers }).map(
@@ -636,13 +678,17 @@ const AddProfile = () => {
                 )
               )}
             </>
-          )}
+          )} */}
         </div>
       )}
       {/* Education Details */}
       {step === 11 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/education.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Education Details</h3>
           <label>
             Degree:<span style={{ color: "red" }}> *</span>
@@ -668,7 +714,11 @@ const AddProfile = () => {
       {/* Employment Details */}
       {step === 12 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/office.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Employment Details</h3>
           <DropdownInput
             label="Are you employed in:"
@@ -705,10 +755,14 @@ const AddProfile = () => {
           />
         </div>
       )}
-
+      {/* Address Details */}
       {step === 13 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/placeholder.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Address Details</h3>
           <label>
             State:<span style={{ color: "red" }}> *</span>
@@ -761,9 +815,14 @@ const AddProfile = () => {
           )}
         </div>
       )}
+      {/* Social Media Links */}
       {step === 14 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/instagram.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Social Media Links</h3>
           <label>Facebook:</label>
           <input
@@ -804,9 +863,14 @@ const AddProfile = () => {
           )}
         </div>
       )}
+      {/* Lifestyle Details */}
       {step === 15 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
+          <img
+            src="/lifestyle.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
+          />
           <h3>Lifestyle Details</h3>
           <label>
             Diet:<span style={{ color: "red" }}> *</span>
@@ -825,48 +889,46 @@ const AddProfile = () => {
           {errors.diet && <p style={{ color: "red" }}>{errors.diet}</p>}
         </div>
       )}
-
+      {/* Upload Profile Images */}
       {step === 16 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
-          <h3>Upload Profile Images</h3>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => handleImageUpload(e, "profile")}
+          <img
+            src="/profile.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
           />
-          {profileImages.map((image, index) => (
-            <div key={index}>
-              <img
-                src={image.url}
-                alt={`Profile Image ${index + 1}`}
-                width="100"
+
+          <div style={{ display: "flex", flexWrap: "wrap" }}>
+            {Array.from({ length: 6 }).map((_, index) => (
+              <PhotoUpload
+                key={index}
+                profileId={"670be21366eb9770ed8867c1"}
+                onUpload={(image) => handleImageUpload(image)}
               />
-            </div>
-          ))}
+            ))}
+          </div>
+          <p>Profile Images (At least 1 required)</p>
         </div>
       )}
-
+      {/* Kundali Images */}
       {step === 17 && (
         <div>
-          <img src="/gender.png" alt="Male" style={{ width: "150px" }} />
-          <h3>Upload Kundali Images</h3>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => handleImageUpload(e, "kundali")}
+          <img
+            src="/kundali.png"
+            alt="Male"
+            style={{ width: "50px", marginBottom: "20px" }}
           />
-          {kundaliImages.map((image, index) => (
-            <div key={index}>
-              <img
-                src={image.url}
-                alt={`Kundali Image ${index + 1}`}
-                width="100"
+          <h3>Upload Kundali Images</h3>
+          
+         <div style={{ display: "flex", flexWrap: "wrap" }}>
+            {Array.from({ length: 3 }).map((_, index) => (
+              <PhotoUpload
+                key={index}
+                profileId={"670be21366eb9770ed8867c1"}
+                onUpload={(image) => handleImageUpload(image)}
               />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 

@@ -40,25 +40,25 @@ const PhotoUpload = ({ profileId = "670bd8d5b837ab94773ed826", onUpload }) => {
 
   return (
     <div id="photo-upload-container" className="photo-upload-container">
-      {image ? (
-        <div className="photo-preview">
-          <img src={`data:image/jpeg;base64,${image.imageUrl}`} alt="Uploaded" className="uploaded-image" />
-          <button onClick={handleDelete} className="cancel-button">X</button>
-        </div>
-      ) : (
-        <label className="photo-upload-box">
-          <input 
-            type="file" 
-            onChange={handleUpload} 
-            accept="image/*" 
-            className="photo-upload-input" 
-            style={{ display: 'none' }} // Hide the default file input
-          />
-          <div className="plus-icon">+</div>
-          <div className="size-limit-text">Max size: 5MB</div>
-        </label>
-      )}
-    </div>
+    {image ? (
+      <div className="photo-preview">
+        <img src={`data:image/jpeg;base64,${image.imageUrl}`} alt="Uploaded" className="uploaded-image" />
+        <button onClick={handleDelete} className="cancel-button">X</button>
+      </div>
+    ) : (
+      <label className="photo-upload-box">
+        <input 
+          type="file" 
+          onChange={handleUpload} 
+          accept="image/*" 
+          className="photo-upload-input" 
+          style={{ display: 'none' }} // Hide the default file input
+        />
+        <div className="plus-icon">+</div>
+        <div className="size-limit-text">Max size: 3MB</div>
+      </label>
+    )}
+  </div>
   );
 };
 

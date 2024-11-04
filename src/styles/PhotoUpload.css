@@ -9,6 +9,7 @@
     justify-content: center;
     overflow: hidden; /* Hide any overflow */
     cursor: pointer;
+    margin:10px;
   }
   
   .photo-preview {
