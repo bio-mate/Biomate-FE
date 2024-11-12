@@ -233,22 +233,30 @@ const AddProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("personalDetails", JSON.stringify(personalDetails));
+    formData.append("religiousDetails", JSON.stringify(religiousDetails));
+    formData.append("astroDetails", JSON.stringify(astroDetails));
+    formData.append("familyDetails", JSON.stringify(familyDetails));
+    formData.append("educationDetails", JSON.stringify(educationDetails));
+    formData.append("employmentDetails", JSON.stringify(employmentDetails));
+    formData.append("address", JSON.stringify(address));
+    formData.append("socialMedia", JSON.stringify(socialMedia));
+    formData.append("paymentStatus", paymentStatus);
+    formData.append("isPublished", isPublished);
+    formData.append("diet", diet);
 
-    const formData = {
-      personalDetails,
-      religiousDetails,
-      astroDetails,
-      familyDetails,
-      educationDetails,
-      employmentDetails,
-      address,
-      socialMedia,
-      profileImages,
-      kundaliImages,
-      paymentStatus,
-      isPublished,
-      diet,
-    };
+    profileImages.forEach((image, index) => {
+      if (image.url) {
+        formData.append(`profileImages[${index}]`, image.file);
+      }
+    });
+
+    kundaliImages.forEach((image, index) => {
+      if (image.url) {
+        formData.append(`kundaliImages[${index}]`, image.file);
+      }
+    });
 
     // Retrieve token
     const token =
@@ -263,7 +271,7 @@ const AddProfile = () => {
       const response = await axios.post("/mate/api/v1/profile/save", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       });
       console.log("Response:", response.data);
@@ -278,32 +286,29 @@ const AddProfile = () => {
 
   const handleImageUpload = (e, type) => {
     const files = Array.from(e.target.files);
-
-    // Filter files that are within the 3MB size limit
     const filteredFiles = files.filter((file) => file.size <= 3 * 1024 * 1024);
-
-    // Map the files to include additional information for preview
-    const newImages = filteredFiles.map((file) => ({
-      url: URL.createObjectURL(file), // For previewing
-      lastModified: file.lastModified,
-      lastModifiedDate: file.lastModifiedDate,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      status: 1, // Default status
-    }));
+    const limitedFiles =
+      type === "profile"
+        ? filteredFiles.slice(0, 6)
+        : filteredFiles.slice(0, 2);
 
     if (type === "profile") {
-      // Append new images to existing profile images, limiting to 6 total
       setProfileImages((prevImages) => [
         ...prevImages,
-        ...newImages.slice(0, 6 - prevImages.length),
+        ...limitedFiles.map((file) => ({
+          file,
+          url: URL.createObjectURL(file),
+          status: 1,
+        })),
       ]);
     } else if (type === "kundali") {
-      // Append new images to existing kundali images, limiting to 2 total
       setKundaliImages((prevImages) => [
         ...prevImages,
-        ...newImages.slice(0, 2 - prevImages.length),
+        ...limitedFiles.map((file) => ({
+          file,
+          url: URL.createObjectURL(file),
+          status: 1,
+        })),
       ]);
     }
   };
@@ -944,7 +949,7 @@ const AddProfile = () => {
           </div>
         </div>
       )}
-      
+
       {/* Kundali Images */}
       {step === 17 && (
         <div>
