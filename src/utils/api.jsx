@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 // Create an Axios instance with default configurations
 const api = axios.create({
-    baseURL: 'http://localhost:8804/', // Set your base URL here
+    baseURL: 'http://localhost:3001/', // Set your base URL here
     timeout: 10000, // Timeout after 10 seconds
     headers: {
         'Content-Type': 'application/json',

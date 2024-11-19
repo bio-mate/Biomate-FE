@@ -5,9 +5,9 @@ import ProgressBar from "../../Atoms/ProgressBar";
 import axios from "axios";
 import styled from "styled-components";
 import "../../styles/InputField.css";
-import IconRadioGroup from "../../components/IconRadioGroup";
-import TextInput from "../../components/TextInput";
-import DropdownInput from "../../components/DropdownInput";
+import IconRadioGroup from "../../Atoms/IconRadioGroup";
+import TextInput from "../../Atoms/TextInput";
+import DropdownInput from "../../Atoms/DropdownInput";
 import {
   titles,
   complexions,
@@ -22,26 +22,28 @@ import {
 } from "../../constant/constant";
 
 import "../../styles/PhotoUpload.css";
+
+const Header = styled.div`
+display: flex;
+width: 100%;
+align-items: center;
+justify-content: space-between; /* Align items to edges */
+margin-bottom: 1rem;
+`;
+
+const Footer = styled.div`
+position: fixed;
+bottom: 20px;
+width: 80%;
+display: flex;
+justify-content: center;
+align-items: center;
+`;
 const AddProfile = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
 
-  const Header = styled.div`
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between; /* Align items to edges */
-    margin-bottom: 1rem;
-  `;
-
-  const Footer = styled.div`
-    position: fixed;
-    bottom: 20px;
-    width: 80%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  `;
+ 
 
   // States for each section
   const [personalDetails, setPersonalDetails] = useState({
@@ -113,6 +115,7 @@ const AddProfile = () => {
   const [isPublished, setIsPublished] = useState(false);
   const [diet, setDiet] = useState("");
   const [errors, setErrors] = useState({});
+  const id = ""
 
   // const validateFields = () => {
   //   const newErrors = {};
@@ -260,7 +263,7 @@ const AddProfile = () => {
 
     // Retrieve token
     const token =
-      "18df68359fbef5047b03501aa8ecf465:7ce454f3c536cc51f912102e8904da7f92abb465ce60c1a51cd6ccec917bdff96a32a02e094111ea5e0884edd1909b21a7c85d7263245fe8f1a527e09bef1af5eb0a93e3a88f4425c00f306d33298b433f5fe1cdc5343d9a8fa51d44e7a0c3dd1a956a253411d179a209d9acb67671ee9205ff35172463338cd08f01b0f2525369d2093078ed159bc79311a07b3f438494e04f2476dfac9a646f678e6e2c4355f4e88724493cd91514d5cbfe359ab62d2d9a6f801543e5ec2832261c2134033e4f6e065e9554c29066b0077711863b7757a6356b09b44e955893c54fa8426b3fbfc1db1f441328d358db6c5beaeb51e7e93e312974dbd167ac9c4092cec56ffceacbb1d3768e2b30888da8c92c1f42414d9e6046b94c947ee0270e9568fdaa1b7e83e6be1fb37de9f63088e3dddfadb03ef50b177421dda0c489b9dd54f14d7bd4ca0a0ee804e6b59c713da2a64e619e4414d310bd49c5ad70e9d5f76252314ad98a36f4715b9cab1bf1e04788968cc2db23a41d09bfe2fbea6f97e970bd9555974f644de03bb9035fadb74f978970992c22074df2be4392d6028c98633ffeaa122ba689c9b617cfffb1181fe8a908d96d3420059b46cc5ea8c111cfb3cbb3c0f11b2efe9ae74726ffffc563fbfd97953a277f8ebaa649d53b8e4b33e66df1cdb3f254d3cd58901bfcf9b0bc50d6087b0725e595c8a4bca7e321e0d7857aa73d9887672617"; // Use actual token retrieval logic
+      "52e651390bdfed1666b6eb7dda5fa8ec:82bb4e507a1acadee26a35577053798e3d11034693ee791c4ca4b3bcceccfbb084f02175032b1d50f30db02399b0fd15e6d7219e614b273ed41cf07718665cb7a6e93c3f3c55f69be1e18028d41f84af8a502f854fb8ccdd2f8e1b67daff305b795759ce5692c2cac8acc6d7d227c573185730c30f0d8c223c142bdadb30be3824ffb83639157e86fc244c74161d06f126be2ca43bed0cd910708060eb7c2023f979049dccbad8dee4bf7d69c394efd35a78d75e23d4d8b445bc767db59d7fb51047046d42a7dcb10b175987fb3e2ff9534d604b961d5f6727eb46615f0280cdb005eb8d811c98bc69ff3cf2dcbe22fa480566e2d76d45de21b615c51ffe76fe660a332d90eba797d3819a55e9cb63db3fb984863a75c22cf4d437f0741b8b2722cedfbee2e4a13116f3e6dac146e4c043926b08886bd81f36313b197528b54dc47293275c2e69f04eca2f7596f2bbd4ca1ed6a845f47879e5f49dc9d8712c320f98aa69dc466664885a590589796a767266c1412237f35b52d61fd31154301583b6bbaa207b0b94620074528a03b68bc3c8b39971e8b02095c24f97083e1bee7363ca66b0714582427ba2458ea1d2844fe3ef33619b51402a911380ff02bbb0dd98498f9a6c6d605022094d56991fe958cddef2705f1d8f3b0743d7523e3096b864bada346b8ee5306c244cbdb948021fc874ae092d431da170cb943beb38749887672617"; // Use actual token retrieval logic
 
     if (!token) {
       console.error("No token found. Please log in.");
@@ -275,7 +278,7 @@ const AddProfile = () => {
         },
       });
       console.log("Response:", response.data);
-      navigate("/success"); // Navigate on success
+      navigate(`/user-profile/${id}`); // Navigate on success
     } catch (error) {
       console.error(
         "Error:",

@@ -7,15 +7,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useUserContext } from "../../context/userContext"; // Import the context
 import CustomButton from "../../Atoms/CustomButton";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-  const { login } = useUserContext(); // Get the login function from context
-  const [mobile, setMobile] = useState("");
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-
-  const Footer = styled.div`
+const Footer = styled.div`
     position: fixed;
     bottom: 20px;
     width: 80%;
@@ -23,6 +17,16 @@ const Login = () => {
     justify-content: center;
     align-items: center;
   `;
+  
+const Login = () => {
+  const { login } = useUserContext(); // Get the login function from context
+  const [mobile, setMobile] = useState("");
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const navigate = useNavigate()
+
+  
 
   const validateMobile = () => {
     if (!mobile) {
@@ -78,6 +82,7 @@ const Login = () => {
         setMobile("");
         setOtp("");
         setOtpSent(false);
+        navigate('/addProfile')
       } else {
         toast.error("Invalid OTP. Please try again.");
       }
@@ -149,6 +154,7 @@ const Login = () => {
                 type="primary"
                 className="btn btn-primary w-100"
                 label={"Submit OTP"}
+                onClick={handleVerifyOtp}
               ></CustomButton>
             )}
           </form>

@@ -27,10 +27,11 @@ const App = () => {
             <Route path="/login" element={<Login />} />
 
             {/* Private Routes */}
-            <Route
+            {/* <Route
               path="/profile"
               element={<ProtectedRoute component={Profile} />}
-            />
+            /> */}
+            <Route path="/profile" element={<Profile />} />
             <Route path="/addProfile" element={<AddProfile />} />
             <Route path="/updateProfile" element={<UpdateProfile />} />
 

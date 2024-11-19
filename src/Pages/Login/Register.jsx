@@ -6,6 +6,16 @@ import CustomButton from "../../Atoms/CustomButton";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styled from "styled-components";
+
+const Footer = styled.div`
+    position: fixed;
+    bottom: 20px;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `;
+  
 const Register = () => {
   const [formData, setFormData] = useState({
     mobile: "",
@@ -14,14 +24,7 @@ const Register = () => {
     district: "",
   });
   const [errors, setErrors] = useState({});
-  const Footer = styled.div`
-    position: fixed;
-    bottom: 20px;
-    width: 80%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  `;
+  
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
