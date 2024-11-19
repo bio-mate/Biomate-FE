@@ -6,17 +6,17 @@ import ProfileCard from "../../components/ProfileCard";
 import DetailsPage from "../../components/PersonalDetails";
 import Footer from "../../components/Footer";
 import KundaliCard from "../../components/KundaliCard";
+import { useParams } from "react-router-dom";
 
 const ViewProfile = ({ edit = true, isPreviewPage }) => {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Hardcoded ID for fetching profile data
-  const id = "6723dc4fad99431d3c359914";
+  const { id } = useParams();
+  console.log("userID", id);
   const token =
-    "18df68359fbef5047b03501aa8ecf465:7ce454f3c536cc51f912102e8904da7f92abb465ce60c1a51cd6ccec917bdff96a32a02e094111ea5e0884edd1909b21a7c85d7263245fe8f1a527e09bef1af5eb0a93e3a88f4425c00f306d33298b433f5fe1cdc5343d9a8fa51d44e7a0c3dd1a956a253411d179a209d9acb67671ee9205ff35172463338cd08f01b0f2525369d2093078ed159bc79311a07b3f438494e04f2476dfac9a646f678e6e2c4355f4e88724493cd91514d5cbfe359ab62d2d9a6f801543e5ec2832261c2134033e4f6e065e9554c29066b0077711863b7757a6356b09b44e955893c54fa8426b3fbfc1db1f441328d358db6c5beaeb51e7e93e312974dbd167ac9c4092cec56ffceacbb1d3768e2b30888da8c92c1f42414d9e6046b94c947ee0270e9568fdaa1b7e83e6be1fb37de9f63088e3dddfadb03ef50b177421dda0c489b9dd54f14d7bd4ca0a0ee804e6b59c713da2a64e619e4414d310bd49c5ad70e9d5f76252314ad98a36f4715b9cab1bf1e04788968cc2db23a41d09bfe2fbea6f97e970bd9555974f644de03bb9035fadb74f978970992c22074df2be4392d6028c98633ffeaa122ba689c9b617cfffb1181fe8a908d96d3420059b46cc5ea8c111cfb3cbb3c0f11b2efe9ae74726ffffc563fbfd97953a277f8ebaa649d53b8e4b33e66df1cdb3f254d3cd58901bfcf9b0bc50d6087b0725e595c8a4bca7e321e0d7857aa73d9887672617";
+    "e534555d00f37649827e53a1a8b7395b:9b51f399b15bbfe2aafd4f06f824700d0f1d4ceb5ab4cb870a0a3a754be03292154b632970ce76216a8220b0015e4bd062fe06ca46f61ed64781ab17da8554f90bf986e73273d2e6c2b1c84532cc8da7f46625f914b6407a944ec17fc9f33fef477ccb6a7a72d8ba3039fe42d51c99d65d649fc8b0a1838910d3d5d24a28419f445df6a908599adb30632610fddf697e707b610be041d49b8718120fc9c6589cdb89a076e833be4ce418d42a6ad147c19bb84e79f60eb3013a351d03741fa2c30ea7991c7d65804d410c57cc8ac633ed823a4cbb9a3513158f7a89cc737e006354cc24946a3d611416c780a6dc75751dd1d2049b465308bb98d39ee3b50d2c9df8bd275f2e14d2a26c8d677c09335feac957c35c32e99269d6ef5b18fc47cb01445663227f7b9b6fab1fc6a48b9b9bb036b5ea645845d55c0a8286d623ea70ba22698312056e84a4991ba12da1e6a7de10e9172104a242c81717e8aac9438aa6b2fd0e61f337bd488572acea84160a540bf7771e6f9fffd7540856ce7468d2ad0100cd9847d94490f71ae8eb7889982381717b4c0d038a0168ab30b41990e1ab571cb53ea6c81e260de331dd77bb58ef3b2eff22ced93f74f3bcf05d03fa7c4d85d8e0142b4968159241d6a515a9f6a4cf4c283eb3ad13ee06b4346090c7571189c2bbecad063fd7c29fddaf9218b83bc0f3bd0e39370ceeecb0865b96be8f5e9887672617";
   console.log("viewToken", token);
   useEffect(() => {
     const fetchProfile = async () => {
@@ -24,14 +24,15 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
 
       try {
         const response = await axios.get(
-          `/mate/api/v1/profile/get-profile/${id}`,
+          `/mate/api/v1/profile/user-profile/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setProfile(response.data);
+        setProfile(response.data.data.profile);
+        console.log("resdata",response.data)
       } catch (error) {
         console.error("Error fetching profile:", error);
         console.error(
@@ -68,8 +69,8 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
           profile.personalDetails?.last_name || "N/A"
         }`}
         age={profile.personalDetails?.age || "N/A"}
-        location={`${profile.contactInformation?.address?.district || "N/A"}, ${
-          profile.contactInformation?.address?.state || "N/A"
+        location={`${profile.address?.district || "N/A"}, ${
+          profile.address?.state || "N/A"
         }, ${profile.contactInformation?.address?.country || "N/A"}`}
         profession={profile.careerDetails?.designation || "N/A"}
         company={profile.careerDetails?.companyName || "N/A"}
@@ -82,22 +83,22 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
       <DetailsPage
         // Personal Details
         gender={profile.personalDetails?.gender || "N/A"}
-        bloodGroup={profile.personalDetails?.bloodGroup || "N/A"}
+        bloodGroup={profile.personalDetails?.blood_group || "N/A"}
         complexion={profile.personalDetails?.complexion || "N/A"}
         height={profile.personalDetails?.height || "N/A"}
         weight={`${profile.personalDetails?.weight || "N/A"} kg`}
         // Religious Background
-        religion={profile.religiousBackground?.religion || "N/A"}
-        caste={profile.religiousBackground?.caste || "N/A"}
-        subCaste={profile.religiousBackground?.subCaste || "N/A"}
-        language={profile.religiousBackground?.language || "N/A"}
+        religion={profile.religiousDetails?.religion || "N/A"}
+        caste={profile.religiousDetails?.caste || "N/A"}
+        subCaste={profile.religiousDetails?.subCaste || "N/A"}
+        language={profile.religiousDetails?.language || "N/A"}
         // Astro Details
-        dateOfBirth={profile.astroDetails?.dateOfBirth || "N/A"}
-        placeOfBirth={profile.astroDetails?.placeOfBirth || "N/A"}
-        timeOfBirth={profile.astroDetails?.timeOfBirth || "N/A"}
+        dateOfBirth={profile.astroDetails?.dob || "N/A"}
+        placeOfBirth={profile.astroDetails?.pob || "N/A"}
+        timeOfBirth={profile.astroDetails?.tob || "N/A"}
         rashi={profile.astroDetails?.rashi || "N/A"}
         nakshatra={profile.astroDetails?.nakshatra || "N/A"}
-        gotra={profile.astroDetails?.gotra || "N/A"}
+        gotra={profile.religiousDetails?.gotra || "N/A"}
         location={`${profile.contactInformation?.address?.district || "N/A"}, ${
           profile.contactInformation?.address?.state || "N/A"
         }`}
@@ -106,24 +107,24 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
         motherName={profile.familyDetails?.motherName || "N/A"}
         fatherOccupation={profile.familyDetails?.fatherOccupation || "N/A"}
         motherOccupation={profile.familyDetails?.motherOccupation || "N/A"}
-        noOfBrothers={profile.familyDetails?.noOfBrothers || "N/A"}
-        noOfSisters={profile.familyDetails?.noOfSisters || "N/A"}
+        noOfBrothers={profile.familyDetails?.noOfBrothers || "0"}
+        noOfSisters={profile.familyDetails?.noOfSisters || "0"}
         // Education Details
         degree={profile.educationDetails?.degree || "N/A"}
         collegeName={profile.educationDetails?.collegeName || "N/A"}
         // Career Details
-        employedIn={profile.careerDetails?.employedIn || "N/A"}
-        companyName={profile.careerDetails?.companyName || "N/A"}
-        position={profile.careerDetails?.designation || "N/A"}
-        income={profile.careerDetails?.income || "N/A"}
+        workingWith={profile.employmentDetails?.employeeIn || "N/A"}
+        companyName={profile.employmentDetails?.companyName || "N/A"}
+        position={profile.employmentDetails?.designation || "N/A"}
+        income={profile.employmentDetails?.income || "N/A"}
         // LifeStyle
-        lifeStyle={profile.lifestyle?.diet || "N/A"}
+        lifeStyle={profile.diet || "N/A"}
         // Contact Details
         country={profile.contactInformation?.address?.country || "N/A"}
         district={profile.contactInformation?.address?.district || "N/A"}
         state={profile.contactInformation?.address?.state || "N/A"}
         residentialAddress={
-          profile.contactInformation?.address?.residentialAddress || "N/A"
+          profile.address?.residentialAddress || "N/A"
         }
         permanentAddress={
           profile.contactInformation?.address?.permanentAddress || "N/A"

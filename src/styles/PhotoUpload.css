@@ -1,12 +1,12 @@
 .image-upload-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 }
 
 .image-box {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   border: 2px dashed #ddd;
   position: relative;
   display: flex;

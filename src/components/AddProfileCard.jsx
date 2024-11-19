@@ -16,12 +16,13 @@ const AddProfileCard = ({
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
   const [preloadedImages, setPreloadedImages] = useState([]);
-const navigate = useNavigate();
+  const id = "673c2cc5701814f3cc8b6fc9";
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:4000/api/profile/viewProfile/${userId}`
+          `/mate/api/v1/profile/user-profile/${id}`
         );
         setProfileData(response.data);
       } catch (error) {
@@ -60,17 +61,15 @@ const navigate = useNavigate();
     );
   }
 
-  
-
   const handleEdit = () => {
     console.log("Edit clicked");
-    navigate(`/edit-profile/${userId}`)
+    navigate(`/edit-profile/${userId}`);
     // Add logic to handle editing the profile
   };
 
   const handleView = () => {
     console.log("View clicked");
-    navigate(`/user-profile/${userId}`)
+    navigate(`/user-profile/${id}`);
     // Add logic to handle viewing the profile
   };
 
@@ -114,10 +113,10 @@ const navigate = useNavigate();
           {/* Action Buttons */}
           <div className="mt-3 d-flex">
             <button className="btn btn-primary me-2" onClick={handleEdit}>
-              <FaEdit /> 
+              <FaEdit />
             </button>
             <button className="btn btn-secondary" onClick={handleView}>
-              <FaEye /> 
+              <FaEye />
             </button>
           </div>
         </div>

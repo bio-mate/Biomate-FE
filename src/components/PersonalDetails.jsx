@@ -8,6 +8,8 @@ import { RiHomeHeartFill } from "react-icons/ri";
 import { MdOutlineCastForEducation } from "react-icons/md";
 import { MdNightlife } from "react-icons/md";
 import { IoMdCall } from "react-icons/io";
+import CustomButton from "../Atoms/CustomButton";
+import Tabs from "../Atoms/Tabs";
 
 const SmallCard = ({ label, value }) => {
   return (
@@ -42,9 +44,9 @@ const SmallCard = ({ label, value }) => {
 
 const SummaryDetails = ({ details }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
   // Concatenate details into a single string for display
-  const fullText = details.join(' ');
+  const fullText = details.join(" ");
 
   // Function to toggle expanded state
   const toggleExpand = () => {
@@ -53,20 +55,31 @@ const SummaryDetails = ({ details }) => {
 
   return (
     <div className="container mt-5">
-      <h3 className="mb-4" style={{color:'rgb(254, 114, 76)'}}>What I’m Looking For</h3>
+      <h3 className="mb-4" style={{ color: "rgb(254, 114, 76)" }}>
+        What I’m Looking For
+      </h3>
       <div className="card shadow-lg border-light">
-        <div className="card-body" style={{textAlign:'justify'}}>
+        <div className="card-body" style={{ textAlign: "justify" }}>
           <p>
             {isExpanded ? fullText : `${fullText.slice(0, 200)}...`}
             {!isExpanded && fullText.length > 200 && (
-              <span className="cursor-pointer" style={{color:'rgb(254, 114, 76)'}} onClick={toggleExpand}>
-                {" "}Read More
+              <span
+                className="cursor-pointer"
+                style={{ color: "rgb(254, 114, 76)" }}
+                onClick={toggleExpand}
+              >
+                {" "}
+                Read More
               </span>
             )}
           </p>
           {isExpanded && (
-            <span className="text-primary cursor-pointer" onClick={toggleExpand}>
-              {" "}Read Less
+            <span
+              className="text-primary cursor-pointer"
+              onClick={toggleExpand}
+            >
+              {" "}
+              Read Less
             </span>
           )}
         </div>
@@ -148,7 +161,7 @@ const DetailsPage = ({
   timeOfBirth,
   Weight,
   bloodGroup,
-  cast,
+  caste,
   gender,
   rashi,
   complexion,
@@ -166,6 +179,7 @@ const DetailsPage = ({
   noOfBrothers,
   noOfSisters,
   subCaste,
+  workingWith,
 }) => {
   const summaryDetails = [
     `I am seeking a partner who embodies kindness, respect, and a genuine sense of humor. Ideally, someone who is: Understanding and Supportive: I value open communication and emotional support. I appreciate a partner who listens and shares their thoughts, fostering a relationship built on trust and mutual respect.
@@ -213,11 +227,11 @@ Respectful of Traditions: Appreciates our cultural heritage.
       value: religion,
     },
     {
-      label: "Cast",
-      value: cast,
+      label: "Caste",
+      value: caste,
     },
     {
-      label: "Sub Cast",
+      label: "Sub Caste",
       value: subCaste,
     },
     {
@@ -280,7 +294,7 @@ Respectful of Traditions: Appreciates our cultural heritage.
     },
   ];
 
-  const educationCareerDetails = [
+  const educationDetails = [
     {
       label: "Degree",
       value: degree,
@@ -288,6 +302,12 @@ Respectful of Traditions: Appreciates our cultural heritage.
     {
       label: "College Name",
       value: collegeName,
+    },
+  ];
+  const careerDetails = [
+    {
+      label: "Working with",
+      value: workingWith,
     },
     {
       label: "Company Name",
@@ -333,6 +353,19 @@ Respectful of Traditions: Appreciates our cultural heritage.
     },
   ];
 
+  const hobbies = [
+    "Painting",
+    "Photography",
+    "Writing",
+    "Gardening",
+    "Cooking",
+    "Dancing",
+    "Hiking",
+    "Swimming",
+    "Reading",
+    "Traveling",
+  ];
+
   return (
     <div>
       <SummaryDetails details={summaryDetails} />
@@ -358,8 +391,13 @@ Respectful of Traditions: Appreciates our cultural heritage.
       />
       <Section
         icon={<MdOutlineCastForEducation />}
-        title="Education & Career Details"
-        details={educationCareerDetails}
+        title="Education Details"
+        details={educationDetails}
+      />
+      <Section
+        icon={<MdOutlineCastForEducation />}
+        title="Career Details"
+        details={careerDetails}
       />
       <Section
         icon={<MdNightlife />}
@@ -372,6 +410,30 @@ Respectful of Traditions: Appreciates our cultural heritage.
         title="Contact Details"
         details={contactDetails}
       />
+
+      <div
+        style={{
+          background: colors.White,
+          padding: "5px",
+          margin: "15px",
+          color: colors.PlainOrange,
+          display: "flex",
+        }}
+      >
+        <div
+          style={{ fontSize: "25px", marginTop: "-7px", marginRight: "5px" }}
+        >
+          <IoMdCall />
+        </div>
+
+        <h3 className="">Hobbbies</h3>
+      </div>
+      <div style={{margin:'15px'}}>
+        {hobbies.map((hobby, index) => (
+          <Tabs key={index} type="primary" label={hobby} />
+        ))}
+      </div>
+      <SummaryDetails details={summaryDetails} />
     </div>
   );
 };

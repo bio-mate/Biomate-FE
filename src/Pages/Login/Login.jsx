@@ -10,23 +10,21 @@ import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
 const Footer = styled.div`
-    position: fixed;
-    bottom: 20px;
-    width: 80%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  `;
-  
+  position: fixed;
+  bottom: 20px;
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const Login = () => {
   const { login } = useUserContext(); // Get the login function from context
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const navigate = useNavigate()
-
-  
+  const navigate = useNavigate();
 
   const validateMobile = () => {
     if (!mobile) {
@@ -58,15 +56,16 @@ const Login = () => {
       } else {
         toast.error("Failed to send OTP. Please try again.");
       }
-    } catch (error) {
+    } catch (err) {
       toast.error("Error sending OTP. Please try again later.");
     }
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
+
     if (!otp || otp.length !== 4) {
-      setError("OTP must be 4 digits");
+      toast.error("OTP must be 4 digits");
       return;
     }
 
@@ -82,11 +81,11 @@ const Login = () => {
         setMobile("");
         setOtp("");
         setOtpSent(false);
-        navigate('/addProfile')
+        navigate("/profile");
       } else {
         toast.error("Invalid OTP. Please try again.");
       }
-    } catch (error) {
+    } catch (err) {
       toast.error("Error verifying OTP. Please try again later.");
     }
   };
@@ -96,17 +95,22 @@ const Login = () => {
       <ToastContainer />
       <div className="row justify-content-center">
         <div className="col-md-6">
-          {/* <h3 className="text-center">Login</h3> */}
-          
           <form onSubmit={handleVerifyOtp} className="p-4">
+            <div className="mb-3 text-center">
+              <img
+                src="/smartphone.png"
+                alt="Smartphone Icon"
+                style={{ width: "50px", marginBottom: "20px" }}
+              />
+              <h2>What is your Mobile Number?</h2>
+              <p style={{ fontSize: "12px" }}>
+                You will receive an SMS with a verification code.
+              </p>
+            </div>
+
             <div className="mb-3">
-            <img
-            src="/smartphone.png"
-            alt="Male"
-            style={{ width: "50px", marginBottom: "20px" }}
-          />
               <label htmlFor="mobile" className="form-label">
-                <h2>What is your Mobile Number?</h2>
+                Mobile Number
               </label>
               <input
                 type="text"
@@ -117,45 +121,41 @@ const Login = () => {
                 onChange={(e) => setMobile(e.target.value)}
                 disabled={otpSent}
               />
-
-              <p style={{fontSize:'12px'}}>You will receive an SMS with varification code</p>
               {error && <div className="invalid-feedback">{error}</div>}
             </div>
 
             {!otpSent && (
               <Footer>
                 <CustomButton
-                  type="primary"
-                  className="btn btn-secondary w-100 mb-3"
+                  type="button"
+                  className="btn btn-secondary w-100"
                   onClick={handleSendOtp}
-                  label={"Send OTP"}
-                ></CustomButton>
+                  label="Send OTP"
+                />
               </Footer>
             )}
 
             {otpSent && (
-              <div className="mb-3">
-                <label htmlFor="otp" className="form-label">
-                  Enter OTP
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="otp"
-                  name="otp"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
+              <>
+                <div className="mb-3">
+                  <label htmlFor="otp" className="form-label">
+                    Enter OTP
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="otp"
+                    name="otp"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                  />
+                </div>
+                <CustomButton
+                  type="submit"
+                  className="btn btn-primary w-100"
+                  label="Submit OTP"
                 />
-              </div>
-            )}
-
-            {otpSent && (
-              <CustomButton
-                type="primary"
-                className="btn btn-primary w-100"
-                label={"Submit OTP"}
-                onClick={handleVerifyOtp}
-              ></CustomButton>
+              </>
             )}
           </form>
         </div>

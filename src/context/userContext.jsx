@@ -1,26 +1,28 @@
-// src/contexts/UserContext.js
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useState, useContext } from "react";
 
+// Create the context
 const UserContext = createContext();
 
+// Custom hook to use the UserContext
+export const useUserContext = () => useContext(UserContext);
+
+// Provider component
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  const login = (userData) => {
-    setUser(userData);
+  // Update user details
+  const updateUser = (userDetails) => {
+    setUser(userDetails);
   };
 
-  const logout = () => {
+  // Clear user details (e.g., on logout)
+  const clearUser = () => {
     setUser(null);
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, updateUser, clearUser }}>
       {children}
     </UserContext.Provider>
   );
-};
-
-export const useUserContext = () => {
-  return useContext(UserContext);
 };

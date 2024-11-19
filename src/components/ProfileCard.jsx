@@ -9,7 +9,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const ProfileCard = ({
-  userId,
+  userId = "673c28f5701814f3cc8b6f89",
   name,
   age,
   location,
@@ -30,7 +30,7 @@ const ProfileCard = ({
     const fetchProfileData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:4000/api/profile/viewProfile/${userId}`
+          `/mate/api/v1/profile/user-profile/${userId}`
         );
         setProfileData(response.data);
       } catch (error) {
@@ -107,9 +107,9 @@ const ProfileCard = ({
     console.log("clicked");
   };
 
-  const handleBack =()=>{
-    navigate(`/profile`)
-  }
+  const handleBack = () => {
+    navigate(`/profile`);
+  };
 
   return (
     <div className="text-white mb-4" style={{ width: "100%", height: "100vh" }}>
