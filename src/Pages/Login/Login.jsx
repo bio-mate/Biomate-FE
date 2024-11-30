@@ -77,6 +77,7 @@ const Login = () => {
       );
       if (success) {
         toast.success("Login successful!");
+        localStorage.setItem("authToken", token);
         login({ mobile, token }); // Store user credentials in context
         setMobile("");
         setOtp("");
@@ -102,18 +103,15 @@ const Login = () => {
                 alt="Smartphone Icon"
                 style={{ width: "50px", marginBottom: "20px" }}
               />
-              <h2>What is your Mobile Number?</h2>
-              <p style={{ fontSize: "12px" }}>
-                You will receive an SMS with a verification code.
-              </p>
             </div>
 
             <div className="mb-3">
               <label htmlFor="mobile" className="form-label">
-                Mobile Number
+                <h2>What is your Mobile Number?</h2>
               </label>
               <input
                 type="text"
+                placeholder="Enter your mobile number"
                 className={`form-control ${error ? "is-invalid" : ""}`}
                 id="mobile"
                 name="mobile"
@@ -121,13 +119,16 @@ const Login = () => {
                 onChange={(e) => setMobile(e.target.value)}
                 disabled={otpSent}
               />
+              <p style={{ fontSize: "12px", color: "red" }}>
+                You will receive an SMS with a verification code.
+              </p>
               {error && <div className="invalid-feedback">{error}</div>}
             </div>
 
             {!otpSent && (
               <Footer>
                 <CustomButton
-                  type="button"
+                  type="primary"
                   className="btn btn-secondary w-100"
                   onClick={handleSendOtp}
                   label="Send OTP"
@@ -154,6 +155,7 @@ const Login = () => {
                   type="submit"
                   className="btn btn-primary w-100"
                   label="Submit OTP"
+                  onClick={handleVerifyOtp}
                 />
               </>
             )}

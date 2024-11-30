@@ -14,6 +14,9 @@ export const titles = [
   "Address",
   "Social",
   "Lifestyle",
+  "hobbies",
+  "aboutMe",
+  "lookingFor",
   "Profile Photo",
   "Kundali Photo",
 ];
@@ -142,3 +145,20 @@ export const employeeInOptions = [
   { label: "Self Employed", value: "Self Employed" },
   { label: " Not Working", value: "Not Working " },
 ];
+
+export const hobbiesList = [
+  "Reading",
+  "Writing",
+  "Painting",
+  "Gardening",
+  "Cooking",
+  "Traveling",
+  "Music",
+  "Dancing",
+  "Sports",
+  "Photography",
+  "Gaming",
+  "Crafting",
+];
+
+export const financialStatus = ["Middel", "Rich"];

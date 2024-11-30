@@ -12,11 +12,13 @@ const AddProfileCard = ({
   location,
   profession,
   company,
+  id,
+  profileImage
 }) => {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
   const [preloadedImages, setPreloadedImages] = useState([]);
-  const id = "673c2cc5701814f3cc8b6fc9";
+  
   const navigate = useNavigate();
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -35,20 +37,20 @@ const AddProfileCard = ({
     fetchProfileData();
   }, [userId]);
 
-  useEffect(() => {
-    const loadImages = async () => {
-      if (
-        profileData &&
-        profileData.profileImages &&
-        profileData.profileImages.length > 0
-      ) {
-        const firstImageUrl = `http://localhost:4000/${profileData.profileImages[0].imageUrl}`;
-        setPreloadedImages([firstImageUrl]); // Store only the first image
-      }
-    };
+  // useEffect(() => {
+  //   const loadImages = async () => {
+  //     if (
+  //       profileData &&
+  //       profileData.profileImages &&
+  //       profileData.profileImages.length > 0
+  //     ) {
+  //       const firstImageUrl = `http://localhost:4000/${profileData.profileImages[0].imageUrl}`;
+  //       setPreloadedImages([firstImageUrl]); // Store only the first image
+  //     }
+  //   };
 
-    loadImages();
-  }, [profileData]);
+  //   loadImages();
+  // }, [profileData]);
 
   if (loading) {
     return (
@@ -62,15 +64,11 @@ const AddProfileCard = ({
   }
 
   const handleEdit = () => {
-    console.log("Edit clicked");
-    navigate(`/edit-profile/${userId}`);
-    // Add logic to handle editing the profile
+    navigate(`/edit-profile/${id}`);
   };
 
   const handleView = () => {
-    console.log("View clicked");
     navigate(`/user-profile/${id}`);
-    // Add logic to handle viewing the profile
   };
 
   return (
@@ -78,9 +76,9 @@ const AddProfileCard = ({
       <div className="card shadow p-4" style={{ borderRadius: "10px" }}>
         <div className="text-center">
           {/* Profile Image */}
-          {preloadedImages.length >= 0 && (
+          {profileImage.length >= 0 && (
             <img
-              src={preloadedImages[0]}
+              src={profileImage}
               alt="Profile"
               className="rounded-circle mb-3"
               style={{ width: "150px", height: "150px", objectFit: "cover" }}

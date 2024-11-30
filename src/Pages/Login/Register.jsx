@@ -83,6 +83,7 @@ const Register = () => {
               </label>
               <input
                 type="text"
+                placeholder="Enter your mobile number"
                 className={`form-control ${errors.mobile ? "is-invalid" : ""}`}
                 id="mobile"
                 name="mobile"
@@ -99,6 +100,7 @@ const Register = () => {
               </label>
               <input
                 type="text"
+                placeholder="Enter your name"
                 className={`form-control ${errors.name ? "is-invalid" : ""}`}
                 id="name"
                 name="name"
@@ -115,6 +117,7 @@ const Register = () => {
               </label>
               <input
                 type="text"
+                placeholder="Enter your state"
                 className={`form-control ${errors.state ? "is-invalid" : ""}`}
                 id="state"
                 name="state"
@@ -131,6 +134,7 @@ const Register = () => {
               </label>
               <input
                 type="text"
+                placeholder="Enter your district"
                 className={`form-control ${
                   errors.district ? "is-invalid" : ""
                 }`}

@@ -33,3 +33,8 @@ login-btn {
   background-color: #ff1a1a;
   border-color: #ff1a1a;
 }
+
+.step-icon{
+width: 50px;
+margin-bottom: 20px;
+}

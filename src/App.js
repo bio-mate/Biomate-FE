@@ -14,6 +14,11 @@ import Register from "./Pages/Login/Register";
 import AddProfile from "./Pages/Profile/AddProfile";
 import { UserProvider } from "./context/userContext";
 import Main from "./Pages/Login/Main";
+import UserPreviewPage from "./Pages/Profile/UserPreviewPage";
+import Error401 from "./Pages/StatusPages/Error401";
+import Error404 from "./Pages/StatusPages/Error404";
+import SuccessPage from "./Pages/StatusPages/Success";
+import Error500 from "./Pages/StatusPages/Error500";
 
 const App = () => {
   return (
@@ -25,6 +30,10 @@ const App = () => {
             <Route path="/" element={<Main />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/unauthorized" element={<Error401 />} />
+            <Route path="*" element={<Error404 />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/error" element={<Error500 />} />
 
             {/* Private Routes */}
             {/* <Route
@@ -33,17 +42,13 @@ const App = () => {
             /> */}
             <Route path="/profile" element={<Profile />} />
             <Route path="/addProfile" element={<AddProfile />} />
-            <Route path="/updateProfile" element={<UpdateProfile />} />
-
-            {/* <Route
-            path="/addPhoto"
-            element={<ProtectedRoute component={AddPhoto} />}
-          /> */}
+            <Route path="/user-profile/success/:id" element={<SuccessPage />} />
             <Route
-              path="/edit-profile/:id"
-              element={<ProtectedRoute component={UpdateProfile} />}
+              path="/user-profile/preview/:id"
+              element={<UserPreviewPage edit={false} />}
             />
-            <Route path="/view-profile" element={<ViewProfile />} />
+            <Route path="/view-profile/:id" element={<ViewProfile />} />
+            <Route path="/edit-profile/:id" element={<UpdateProfile />} />
             <Route
               path="/view-profile/:id"
               element={<ViewProfile edit={true} />}
@@ -54,11 +59,6 @@ const App = () => {
             />
 
             {/* Public Routes */}
-            <Route
-              path="/user-profile/:id"
-              element={<ViewProfile edit={false} />}
-            />
-            <Route path="/home" element={<Home />} />
           </Routes>
         </div>
       </Router>

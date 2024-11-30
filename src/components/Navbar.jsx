@@ -7,9 +7,11 @@ import { useUserContext } from "../context/userContext";
 const Navbar = ({ title, isBack = false }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const token = localStorage.getItem("authToken");
   // const { currentUser } = useContext(UserAuthContext);
   const { user, clearUser } = useUserContext();
   console.log("-------------", user);
+  console.log("token", token)
   // Toggle Sidebar (if required)
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
