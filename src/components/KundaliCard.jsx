@@ -1,76 +1,102 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { IoIosArrowDroprightCircle, IoIosArrowDropleftCircle } from "react-icons/io";
-import { Spinner } from "react-bootstrap"; 
+import { Spinner } from "react-bootstrap";
 import axios from "axios";
 
-const KundaliCard = ({ userId }) => {
+const KundaliCard = ({ userId, token, preloadedImages }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState(null);
-  const [preloadedImages, setPreloadedImages] = useState([]);
+  const [error, setError] = useState(null);
+  // const [preloadedImages, setPreloadedImages] = useState([]);
+console.log("preloadedImagespreloadedImages",preloadedImages)
+  // Fetch the profile and extract Kundali images
+  // useEffect(() => {
+  //   const fetchKundaliImages = async () => {
+  //     if (!userId ) {
+  //       setError("Missing user ID or authentication token.");
+  //       setLoading(false);
+  //       return;
+  //     }
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:4000/api/profile/viewProfile/${userId}`);
-        setProfileData(response.data);
-      } catch (error) {
-        console.error("Error fetching profile data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //     try {
+  //       setLoading(true);
+  //       const response = await axios.get(`/mate/api/v1/profile/user-profile/${userId}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
 
-    fetchProfileData();
-  }, [userId]);
+  //       // Assuming Kundali images are stored in a specific key, e.g., `kundaliImages`
+  //       const profile = response.data?.data?.profile;
+  //       console.log("profileprofile",profile)
+  //       if (profile && profile.kundaliImages) {
+  //         setPreloadedImages(profile.kundaliImages);
+  //       } else {
+  //         setError("No Kundali images found.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching profile:", error);
+  //       setError(
+  //         error.response?.data?.message ||
+  //           "Could not fetch profile. Please try again later."
+  //       );
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const loadImages = async () => {
-      if (profileData && profileData.profileImages.length > 0) {
-        const promises = profileData.profileImages.map((image) => {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = `http://localhost:4000/${image.imageUrl}`; 
-            img.onload = () => resolve(img.src);
-            img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
-          });
-        });
+  //   fetchKundaliImages();
+  // }, [userId, token]);
 
-        try {
-          const loadedImages = await Promise.all(promises);
-          setPreloadedImages(loadedImages);
-        } catch (error) {
-          console.error("Error loading images:", error);
-        }
-      }
-    };
-
-    loadImages();
-  }, [profileData]);
-
+  // Handle loading state
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "100vh" }}
+      >
         <Spinner animation="border" variant="light" />
       </div>
     );
   }
 
-  if ( preloadedImages.length === 0) {
-    return <div>No images found.</div>;
+  // Handle error state
+  if (error) {
+    return (
+      <div className="d-flex justify-content-center align-items-center text-danger" style={{ height: "100vh" }}>
+        {error}
+      </div>
+    );
   }
 
+  // Handle no images
+  if (preloadedImages.length === 0) {
+    return (
+      <div className="d-flex justify-content-center align-items-center text-warning" style={{ height: "100vh" }}>
+        No Kundali images found.
+      </div>
+    );
+  }
+
+  // Handle navigation
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === preloadedImages.length - 1 ? 0 : prevIndex + 1));
+    setCurrentIndex((prevIndex) =>
+      prevIndex === preloadedImages.length - 1 ? 0 : prevIndex + 1
+    );
   };
 
   const handlePrev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex === 0 ? preloadedImages.length - 1 : prevIndex - 1));
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? preloadedImages.length - 1 : prevIndex - 1
+    );
   };
 
   return (
-    <div className="text-white" style={{ width: "100%", height: "100vh", position: "relative" }}>
+    <div
+      className="text-white"
+      style={{ width: "100%", height: "100vh", position: "relative" }}
+    >
       <div
         style={{
           backgroundImage: `url(${preloadedImages[currentIndex]})`,
@@ -82,11 +108,30 @@ const KundaliCard = ({ userId }) => {
           transition: "background-image 1s",
         }}
       >
+        <img src={preloadedImages} alt={preloadedImages}/>
         {/* Navigation Buttons */}
-        <div className="position-absolute" style={{ top: "50%", right: "10px", fontSize: "30px", cursor: "pointer" }} onClick={handleNext}>
+        <div
+          className="position-absolute"
+          style={{
+            top: "50%",
+            right: "10px",
+            fontSize: "30px",
+            cursor: "pointer",
+          }}
+          onClick={handleNext}
+        >
           <IoIosArrowDroprightCircle />
         </div>
-        <div className="position-absolute" style={{ top: "50%", left: "10px", fontSize: "30px", cursor: "pointer" }} onClick={handlePrev}>
+        <div
+          className="position-absolute"
+          style={{
+            top: "50%",
+            left: "10px",
+            fontSize: "30px",
+            cursor: "pointer",
+          }}
+          onClick={handlePrev}
+        >
           <IoIosArrowDropleftCircle />
         </div>
       </div>

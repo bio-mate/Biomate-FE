@@ -42,21 +42,21 @@ const SmallCard = ({ label, value }) => {
   );
 };
 
-const SummaryDetails = ({ details }) => {
+const SummaryDetails = ({ details, title }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Concatenate details into a single string for display
-  const fullText = details.join(" ");
-
-  // Function to toggle expanded state
+  // Toggle expanded state
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
+  // Fallback for undefined or empty details
+  const fullText = details || "Details not provided.";
+
   return (
     <div className="container mt-5">
       <h3 className="mb-4" style={{ color: "rgb(254, 114, 76)" }}>
-        What I’m Looking For
+        {title}
       </h3>
       <div className="card shadow-lg border-light">
         <div className="card-body" style={{ textAlign: "justify" }}>
@@ -94,10 +94,10 @@ const Section = ({ title, details, icon }) => {
     <div className="container">
       <div
         style={{
-          background: colors.White,
+          background: colors.PlainOrange,
           padding: "5px",
           marginTop: "15px",
-          color: colors.PlainOrange,
+          color: colors.White,
           display: "flex",
         }}
       >
@@ -107,7 +107,7 @@ const Section = ({ title, details, icon }) => {
           {icon}
         </div>
 
-        <h3 className="">{title}</h3>
+        <h3 style={{color:'white'}}>{title}</h3>
       </div>
 
       <div className="row">
@@ -180,18 +180,12 @@ const DetailsPage = ({
   noOfSisters,
   subCaste,
   workingWith,
+  aboutMe,
+  lookingFor,
+  hobbies,
+  parentNumber,
+  selfNumber
 }) => {
-  const summaryDetails = [
-    `I am seeking a partner who embodies kindness, respect, and a genuine sense of humor. Ideally, someone who is: Understanding and Supportive: I value open communication and emotional support. I appreciate a partner who listens and shares their thoughts, fostering a relationship built on trust and mutual respect.
-
-Understanding and Supportive: Values open communication and emotional connection.
-Family-Oriented: Shares strong family values and enjoys building bonds.
-Ambitious and Driven: Passionate about their goals while balancing life.
-Adventurous: Loves exploring new experiences and places.
-Caring and Compassionate: Kind-hearted and values making a positive impact.
-Respectful of Traditions: Appreciates our cultural heritage.
-  `,
-  ];
   const personalDetails = [
     {
       label: "Gender",
@@ -331,8 +325,12 @@ Respectful of Traditions: Appreciates our cultural heritage.
   ];
   const contactDetails = [
     {
-      label: "Phone",
-      value: phone,
+      label: "Parent Number",
+      value: parentNumber,
+    },
+    {
+      label: "Self Number",
+      value: selfNumber,
     },
     {
       label: "Residential Address",
@@ -353,22 +351,9 @@ Respectful of Traditions: Appreciates our cultural heritage.
     },
   ];
 
-  const hobbies = [
-    "Painting",
-    "Photography",
-    "Writing",
-    "Gardening",
-    "Cooking",
-    "Dancing",
-    "Hiking",
-    "Swimming",
-    "Reading",
-    "Traveling",
-  ];
-
   return (
     <div>
-      <SummaryDetails details={summaryDetails} />
+      <SummaryDetails details={aboutMe} title={'About Me'} />;
       <Section
         icon={<MdAccountCircle />}
         title="Personal Details"
@@ -404,13 +389,11 @@ Respectful of Traditions: Appreciates our cultural heritage.
         title="LifeStyle"
         details={lifeStyleDetails}
       />
-
       <Section
         icon={<IoMdCall />}
         title="Contact Details"
         details={contactDetails}
       />
-
       <div
         style={{
           background: colors.White,
@@ -428,12 +411,12 @@ Respectful of Traditions: Appreciates our cultural heritage.
 
         <h3 className="">Hobbbies</h3>
       </div>
-      <div style={{margin:'15px'}}>
+      <div style={{ margin: "15px" }}>
         {hobbies.map((hobby, index) => (
           <Tabs key={index} type="primary" label={hobby} />
         ))}
       </div>
-      <SummaryDetails details={summaryDetails} />
+      <SummaryDetails details={lookingFor} title={'What I’m Looking For'}/>
     </div>
   );
 };

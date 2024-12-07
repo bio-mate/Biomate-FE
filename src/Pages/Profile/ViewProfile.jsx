@@ -15,12 +15,17 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
   const [error, setError] = useState(null);
   const { id } = useParams();
   const token = localStorage.getItem("authToken");
-  console.log("viewToken", token);
+  console.log("profile", profile);
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!user) return; // Avoid fetching if user is not available
+      if (!id || !token) {
+        setError("Missing user ID or authentication token.");
+        setLoading(false);
+        return;
+      }
 
       try {
+        setLoading(true); // Reset loading state
         const response = await axios.get(
           `/mate/api/v1/profile/user-profile/${id}`,
           {
@@ -30,38 +35,37 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
           }
         );
         setProfile(response.data.data.profile);
-        console.log("resdata",response.data)
       } catch (error) {
         console.error("Error fetching profile:", error);
-        console.error(
-          "Error response:",
-          error.response ? error.response.data : error.message
+        setError(
+          error.response?.data?.message ||
+            "Could not fetch profile. Please try again later."
         );
-        setError("Could not fetch profile. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
-  }, [user]);
+  }, [id, token]); // Trigger when `id` or `token` changes
 
   if (loading) {
     return <div>Loading profile...</div>;
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className="text-red-500">{error}</div>;
   }
 
   if (!profile) {
     return <div>No profile available.</div>;
   }
-
+console.log("profileData", profile)
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center">
       <ProfileCard
-        userId={profile.userId}
+      profileData={profile}
+        userId={profile._id}
         isPreview={edit}
         name={`${profile.personalDetails?.first_name || "N/A"} ${
           profile.personalDetails?.last_name || "N/A"
@@ -79,64 +83,58 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
       />
 
       <DetailsPage
-        // Personal Details
         gender={profile.personalDetails?.gender || "N/A"}
         bloodGroup={profile.personalDetails?.blood_group || "N/A"}
         complexion={profile.personalDetails?.complexion || "N/A"}
         height={profile.personalDetails?.height || "N/A"}
         weight={`${profile.personalDetails?.weight || "N/A"} kg`}
-        // Religious Background
         religion={profile.religiousDetails?.religion || "N/A"}
         caste={profile.religiousDetails?.caste || "N/A"}
         subCaste={profile.religiousDetails?.subCaste || "N/A"}
         language={profile.religiousDetails?.language || "N/A"}
-        // Astro Details
         dateOfBirth={profile.astroDetails?.dob || "N/A"}
         placeOfBirth={profile.astroDetails?.pob || "N/A"}
         timeOfBirth={profile.astroDetails?.tob || "N/A"}
         rashi={profile.astroDetails?.rashi || "N/A"}
         nakshatra={profile.astroDetails?.nakshatra || "N/A"}
         gotra={profile.religiousDetails?.gotra || "N/A"}
-        location={`${profile.contactInformation?.address?.district || "N/A"}, ${
-          profile.contactInformation?.address?.state || "N/A"
+        location={`${profile.address?.permanent?.district || "N/A"}, ${
+          profile.address?.permanent?.state || "N/A"
         }`}
-        // Family Details
         fatherName={profile.familyDetails?.fatherName || "N/A"}
         motherName={profile.familyDetails?.motherName || "N/A"}
         fatherOccupation={profile.familyDetails?.fatherOccupation || "N/A"}
         motherOccupation={profile.familyDetails?.motherOccupation || "N/A"}
         noOfBrothers={profile.familyDetails?.noOfBrothers || "0"}
         noOfSisters={profile.familyDetails?.noOfSisters || "0"}
-        // Education Details
         degree={profile.educationDetails?.degree || "N/A"}
         collegeName={profile.educationDetails?.collegeName || "N/A"}
-        // Career Details
         workingWith={profile.employmentDetails?.employeeIn || "N/A"}
         companyName={profile.employmentDetails?.companyName || "N/A"}
         position={profile.employmentDetails?.designation || "N/A"}
         income={profile.employmentDetails?.income || "N/A"}
-        // LifeStyle
         lifeStyle={profile.diet || "N/A"}
-        // Contact Details
         country={profile.contactInformation?.address?.country || "N/A"}
         district={profile.contactInformation?.address?.district || "N/A"}
         state={profile.contactInformation?.address?.state || "N/A"}
-        residentialAddress={
-          profile.address?.residentialAddress || "N/A"
-        }
+        residentialAddress={profile.address?.residentialAddress || "N/A"}
         permanentAddress={
           profile.contactInformation?.address?.permanentAddress || "N/A"
         }
-        phone={profile.contactInformation?.contactNumber || "N/A"}
+        parentNumber={profile.contactDetails?.parentNumber || "N/A"}
+        selfNumber={profile.contactDetails?.selfNumber || "N/A"}
         facebookUrl={profile.contactInformation?.facebookUrl || "N/A"}
         instagramUrl={profile.contactInformation?.instagramUrl || "N/A"}
         linkedInUrl={profile.contactInformation?.linkedInUrl || "N/A"}
+        hobbies={profile.personalDetails.hobbies}
+        aboutMe={profile.personalDetails?.aboutMe}
+        lookingFor={profile.personalDetails?.lookingFor}
       />
 
-      <KundaliCard userId={profile.userId} />
+      <KundaliCard userId={profile._id} preloadedImages={profile.kundaliImages[0].name}/>
 
       {edit && !isPreviewPage && (
-        <Link to={`/edit-profile/${profile.userId}`}>
+        <Link to={`/edit-profile/${profile._id}`}>
           <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
             Edit Profile
           </button>

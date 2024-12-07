@@ -19,8 +19,9 @@ import {
   gotraOptions,
   incomeOptions,
   employeeInOptions,
-  hobbiesList,
+  hobbiesOptions,
   financialStatus,
+  heightOptions,
 } from "../../constant/constant";
 
 import "../../styles/PhotoUpload.css";
@@ -133,16 +134,13 @@ const AddProfile = () => {
 
   const handleChange = (e, setState) => {
     const { name, value } = e.target;
-    console.log("namename",name)
-    console.log("valuevalue",value)
+    console.log("namename", name);
+    console.log("valuevalue", value);
     setState((prevDetails) => ({
       ...prevDetails,
       [name]: value,
-      
     }));
 
-   
-    
     // Clear error when input is changed
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -150,24 +148,24 @@ const AddProfile = () => {
     }));
   };
 
-   const handleAddressChange = (e, setState) => {
-      const { name, value } = e.target;
-    
-      setState((prevDetails) => {
-        // Split the name to handle nested keys
-        const keys = name.split('.');
-        const newDetails = { ...prevDetails };
-    
-        // Navigate to the appropriate level and update the value
-        let current = newDetails;
-        for (let i = 0; i < keys.length - 1; i++) {
-          current = current[keys[i]];
-        }
-        current[keys[keys.length - 1]] = value;
-    
-        return newDetails;
-      });
-    };
+  const handleAddressChange = (e, setState) => {
+    const { name, value } = e.target;
+
+    setState((prevDetails) => {
+      // Split the name to handle nested keys
+      const keys = name.split(".");
+      const newDetails = { ...prevDetails };
+
+      // Navigate to the appropriate level and update the value
+      let current = newDetails;
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+
+      return newDetails;
+    });
+  };
 
   // Navigate through steps
   const handleNext = () => {
@@ -196,14 +194,18 @@ const AddProfile = () => {
     formData.append("diet", diet);
 
     profileImages.forEach((image, index) => {
-      if (image.url) {
+      if (image.file) {
         formData.append(`profileImages[${index}]`, image.file);
+        formData.append(`profileImages[${index}][status]`, "1");
+        formData.append(`profileImages[${index}][primary]`, "0");
       }
     });
 
     kundaliImages.forEach((image, index) => {
-      if (image.url) {
+      if (image.file) {
         formData.append(`kundaliImages[${index}]`, image.file);
+        formData.append(`kundaliImages[${index}][status]`, "1");
+        formData.append(`kundaliImages[${index}][primary]`, "0");
       }
     });
 
@@ -282,14 +284,14 @@ const AddProfile = () => {
     setPersonalDetails({ ...personalDetails, gender });
     console.log("gender", gender);
   };
-  const heightOptions = [];
-  for (let feet = 4; feet <= 7; feet++) {
-    for (let inches = 0; inches < 12; inches++) {
-      const height = `${feet}'${inches}"`;
-      heightOptions.push(height);
-      if (feet === 7 && inches === 0) break; // Stop at 7'0"
-    }
-  }
+  // const heightOptions = [];
+  // for (let feet = 4; feet <= 7; feet++) {
+  //   for (let inches = 0; inches < 12; inches++) {
+  //     const height = `${feet}'${inches}"`;
+  //     heightOptions.push(height);
+  //     if (feet === 7 && inches === 0) break; // Stop at 7'0"
+  //   }
+  // }
 
   return (
     <>
@@ -336,75 +338,6 @@ const AddProfile = () => {
               error={errors.last_name}
               required
             />
-          </div>
-        )}
-
-        {/* Age */}
-        {step === 2 && (
-          <div>
-            <img src="/age.png" alt="Age" className="step-icon" />
-            <TextInput
-              label="Age"
-              name="age"
-              type="number"
-              value={personalDetails.age}
-              onChange={(e) => handleChange(e, setPersonalDetails)}
-              error={errors.age}
-              required
-            />
-          </div>
-        )}
-
-        {/* Height */}
-        {step === 3 && (
-          <div>
-            <img src="/height.png" alt="Height" className="step-icon" />
-            <TextInput
-              label="Height"
-              name="height"
-              type="number"
-              value={personalDetails.height}
-              onChange={(e) => handleChange(e, setPersonalDetails)}
-              error={errors.height}
-              required
-            />
-          </div>
-        )}
-        {/* {step === 3 && (
-          <div>
-            <img src="/height.png" alt="Height" className="step-icon" />
-            <DropdownInput
-              label="Height"
-              name="height"
-              value={personalDetails.height}
-              onChange={(e) => handleChange(e, setPersonalDetails)}
-              options={heightOptions}
-              error={errors.height}
-              required
-            />
-          </div>
-        )} */}
-
-        {/* Weight */}
-        {step === 4 && (
-          <div>
-            <img src="/weight.png" alt="Weight" className="step-icon" />
-            <TextInput
-              label="Weight"
-              name="weight"
-              type="number"
-              value={personalDetails.weight}
-              onChange={(e) => handleChange(e, setPersonalDetails)}
-              error={errors.weight}
-              required
-            />
-          </div>
-        )}
-
-        {/* Gender */}
-        {step === 5 && (
-          <div>
-            <img src="/gender.png" alt="Gender" className="step-icon" />
             <IconRadioGroup
               label="Select Gender"
               name="gender"
@@ -416,36 +349,67 @@ const AddProfile = () => {
           </div>
         )}
 
-        {/* Complexion */}
-        {step === 6 && (
+        {/* Age */}
+        {step === 2 && (
           <div>
-            <img src="/skin-care.png" alt="Complexion" className="step-icon" />
-            <IconRadioGroup
-              label="Select Complexion"
-              options={complexions}
-              selectedValue={personalDetails.complexion}
-              onChange={handleComplexionSelect}
-              error={errors.complexion}
+            {/* <img src="/age.png" alt="Age" className="step-icon" /> */}
+            <TextInput
+              label="Age"
+              name="age"
+              type="number"
+              value={personalDetails.age}
+              onChange={(e) => handleChange(e, setPersonalDetails)}
+              error={errors.age}
+              required
             />
+            <div>
+              {/* <img src="/height.png" alt="Height" className="step-icon" /> */}
+              <DropdownInput
+                label="Height"
+                name="height"
+                value={personalDetails.height}
+                onChange={(e) => handleChange(e, setPersonalDetails)}
+                options={heightOptions}
+                error={errors.height}
+                required
+              />
+            </div>
+            <div>
+              {/* <img src="/weight.png" alt="Weight" className="step-icon" /> */}
+              <TextInput
+                label="Weight"
+                name="weight"
+                type="number"
+                value={personalDetails.weight}
+                onChange={(e) => handleChange(e, setPersonalDetails)}
+                error={errors.weight}
+                required
+              />
+            </div>
+            <div>
+              {/* <img src="/skin-care.png" alt="Complexion" className="step-icon" /> */}
+              <IconRadioGroup
+                label="Select Complexion"
+                options={complexions}
+                selectedValue={personalDetails.complexion}
+                onChange={handleComplexionSelect}
+                error={errors.complexion}
+              />
+            </div>
+            <div>
+              {/* <img src="/blood.png" alt="Blood Group" className="step-icon" /> */}
+              <IconRadioGroup
+                label="Blood Group"
+                options={bloodGroups}
+                selectedValue={personalDetails.blood_group}
+                onChange={handleBloodGroupSelect}
+                error={errors.blood_group}
+              />
+            </div>
           </div>
         )}
 
-        {/* Blood Group */}
-        {step === 7 && (
-          <div>
-            <img src="/blood.png" alt="Blood Group" className="step-icon" />
-            <IconRadioGroup
-              label="Blood Group"
-              options={bloodGroups}
-              selectedValue={personalDetails.blood_group}
-              onChange={handleBloodGroupSelect}
-              error={errors.blood_group}
-            />
-          </div>
-        )}
-
-        {/* Religious Details */}
-        {step === 8 && (
+        {step === 3 && (
           <div>
             <img src="/pray.png" alt="Religion" className="step-icon" />
             <h3>Religious Details</h3>
@@ -490,7 +454,7 @@ const AddProfile = () => {
         )}
 
         {/* Astro Details */}
-        {step === 9 && (
+        {step === 4 && (
           <div>
             <img src="/astrology.png" alt="Astrology" className="step-icon" />
             <h3>Astro Details</h3>
@@ -536,7 +500,7 @@ const AddProfile = () => {
         )}
 
         {/* Family Details */}
-        {step === 10 && (
+        {step === 5 && (
           <div>
             <img src="/family.png" alt="Family" className="step-icon" />
             <h3>Family Details</h3>
@@ -600,7 +564,7 @@ const AddProfile = () => {
         )}
 
         {/* Education Details */}
-        {step === 11 && (
+        {step === 6 && (
           <div>
             <img
               src="/education.png"
@@ -624,7 +588,7 @@ const AddProfile = () => {
           </div>
         )}
         {/* Career Details */}
-        {step === 12 && (
+        {step === 7 && (
           <div>
             <img
               src="/office.png"
@@ -663,15 +627,8 @@ const AddProfile = () => {
           </div>
         )}
         {/* Address Details */}
-        {step === 13 && (
+        {step === 8 && (
           <div>
-            <img
-              src="/placeholder.png"
-              alt="Address"
-              style={{ width: "50px", marginBottom: "20px" }}
-            />
-            <h3>Address Details</h3>
-
             <div>
               <img
                 src="/placeholder.png"
@@ -752,7 +709,7 @@ const AddProfile = () => {
           </div>
         )}
         {/* Contact  Details */}
-        {step === 14 && (
+        {step === 9 && (
           <div>
             <img
               src="/instagram.png"
@@ -804,108 +761,106 @@ const AddProfile = () => {
           </div>
         )}
         {/* LifeStyle Details */}
-        {step === 15 && (
-          <div>
-            <img
-              src="/lifestyle.png"
-              alt="Lifestyle"
-              style={{ width: "50px", marginBottom: "20px" }}
-            />
-            <h3>Lifestyle Details</h3>
-            <DropdownInput
-              label="Diet"
-              name="diet"
-              value={diet}
-              onChange={(e) => setDiet(e.target.value)}
-              options={[
-                { label: "Select Diet", value: "" },
-                { label: "Vegetarian", value: "vegetarian" },
-                { label: "Non-Vegetarian", value: "non-vegetarian" },
-                { label: "Vegan", value: "vegan" },
-              ]}
-              error={errors.diet}
-            />
-          </div>
-        )}
-        {/* hobbies Detsila */}
-        {step === 16 && (
-          <div>
-            <img
-              src="/hobbies.png"
-              alt="Hobbies"
-              style={{ width: "50px", marginBottom: "20px" }}
-            />
+        {step === 10 && (
+          <>
             <div>
-              <label>Select Hobbies (max 10)</label>
-              <MultiCheckboxTabs
-                options={hobbiesList}
-                selectedOptions={personalDetails.hobbies}
-                onChange={(newHobbies) =>
+              <img
+                src="/lifestyle.png"
+                alt="Lifestyle"
+                style={{ width: "50px", marginBottom: "20px" }}
+              />
+              <h3>Lifestyle Details</h3>
+              <DropdownInput
+                label="Diet"
+                name="diet"
+                value={diet}
+                onChange={(e) => setDiet(e.target.value)}
+                options={[
+                  { label: "Select Diet", value: "" },
+                  { label: "Vegetarian", value: "vegetarian" },
+                  { label: "Non-Vegetarian", value: "non-vegetarian" },
+                  { label: "Vegan", value: "vegan" },
+                ]}
+                error={errors.diet}
+              />
+            </div>
+            {/* <div>
+              <img
+                src="/hobbies.png"
+                alt="Hobbies"
+                style={{ width: "50px", marginBottom: "20px" }}
+              />
+              <div>
+                <label>Select Hobbies (max 10)</label>
+                <MultiCheckboxTabs
+                  options={hobbiesOptions}
+                  selectedOptions={personalDetails.hobbies}
+                  onChange={(newHobbies) =>
+                    setPersonalDetails((prev) => ({
+                      ...prev,
+                      hobbies: newHobbies,
+                    }))
+                  }
+                  maxSelection={10}
+                />
+                {errors.hobbies && (
+                  <p style={{ color: "red", fontSize: "12px" }}>
+                    {errors.hobbies}
+                  </p>
+                )}
+              </div>
+            </div> */}
+          </>
+        )}
+
+        {/* About Me */}
+        {step === 11 && (
+          <>
+            <div>
+              <img
+                src="/feedback.png"
+                alt="Feedback"
+                style={{ width: "50px", marginBottom: "20px" }}
+              />
+              <TextArea
+                label="Provide Your Feedback"
+                value={personalDetails.aboutMe}
+                onChange={(value) =>
                   setPersonalDetails((prev) => ({
                     ...prev,
-                    hobbies: newHobbies,
+                    aboutMe: value,
                   }))
                 }
-                maxSelection={10}
+                maxWords={1000}
+                placeholder="Write your feedback here (max 1000 words)..."
+                error={errors.aboutMe}
               />
-              {errors.hobbies && (
-                <p style={{ color: "red", fontSize: "12px" }}>
-                  {errors.hobbies}
-                </p>
-              )}
+              <div>
+                <img
+                  src="/feedback.png"
+                  alt="Looking For"
+                  style={{ width: "50px", marginBottom: "20px" }}
+                />
+                <TextArea
+                  label="What are you looking for?"
+                  value={personalDetails.lookingFor}
+                  onChange={(value) =>
+                    setPersonalDetails((prev) => ({
+                      ...prev,
+                      lookingFor: value,
+                    }))
+                  }
+                  maxWords={1000}
+                  placeholder="Write your expectations here (max 1000 words)..."
+                  error={errors.lookingFor}
+                />
+              </div>
             </div>
-          </div>
-        )}
-        {/* About Me */}
-        {step === 17 && (
-          <div>
-            <img
-              src="/feedback.png"
-              alt="Feedback"
-              style={{ width: "50px", marginBottom: "20px" }}
-            />
-            <TextArea
-              label="Provide Your Feedback"
-              value={personalDetails.aboutMe}
-              onChange={(value) =>
-                setPersonalDetails((prev) => ({
-                  ...prev,
-                  aboutMe: value,
-                }))
-              }
-              maxWords={1000}
-              placeholder="Write your feedback here (max 1000 words)..."
-              error={errors.aboutMe}
-            />
-          </div>
-        )}
-        {/* Looking For */}
-        {step === 18 && (
-          <div>
-            <img
-              src="/feedback.png"
-              alt="Looking For"
-              style={{ width: "50px", marginBottom: "20px" }}
-            />
-            <TextArea
-              label="What are you looking for?"
-              value={personalDetails.lookingFor}
-              onChange={(value) =>
-                setPersonalDetails((prev) => ({
-                  ...prev,
-                  lookingFor: value,
-                }))
-              }
-              maxWords={1000}
-              placeholder="Write your expectations here (max 1000 words)..."
-              error={errors.lookingFor}
-            />
-          </div>
+          </>
         )}
 
         {/* Upload Profile Images */}
-
-        {step === 19 && (
+        {step === 12 && (
           <div>
             <h3>Upload Profile Images</h3>
             <div className="image-upload-grid">
@@ -940,7 +895,7 @@ const AddProfile = () => {
         )}
 
         {/* Kundali Images */}
-        {step === 20 && (
+        {step === 13 && (
           <div>
             <h3>Upload Kundali Images</h3>
             <div className="image-upload-grid">
@@ -976,7 +931,7 @@ const AddProfile = () => {
 
         <div>
           <Footer>
-            {step < 20 ? (
+            {step < 13 ? (
               <CustomButton
                 type="primary"
                 onClick={handleNext}

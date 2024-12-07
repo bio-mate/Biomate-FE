@@ -1,101 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   IoIosArrowDroprightCircle,
   IoIosArrowDropleftCircle,
 } from "react-icons/io";
 import { Spinner } from "react-bootstrap";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const ProfileCard = ({
-  userId = "673c28f5701814f3cc8b6f89",
-  name,
-  age,
-  location,
-  profession,
-  company,
-  facebookUrl,
-  instagramUrl,
-  linkedInUrl,
-}) => {
+const ProfileCard = ({ profileData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState(null);
-  const [preloadedImages, setPreloadedImages] = useState([]);
-  const [isUser, setIsUser] = useState(true);
-  const [isPreview, setIsPreview] = useState(true);
   const navigate = useNavigate();
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const response = await axios.get(
-          `/mate/api/v1/profile/user-profile/${userId}`
-        );
-        setProfileData(response.data);
-      } catch (error) {
-        console.error("Error fetching profile data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfileData();
-  }, [userId]);
-
-  useEffect(() => {
-    const loadImages = async () => {
-      if (
-        profileData &&
-        profileData.profileImages &&
-        profileData.profileImages.length > 0
-      ) {
-        const promises = profileData.profileImages.map((image) => {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = `http://localhost:4000/${image.imageUrl}`;
-            img.onload = () => resolve(img.src);
-            img.onerror = () =>
-              reject(new Error(`Failed to load image: ${img.src}`));
-          });
-        });
-
-        try {
-          const loadedImages = await Promise.all(promises);
-          setPreloadedImages(loadedImages);
-        } catch (error) {
-          console.error("Error loading images:", error);
-        }
-      }
-    };
-
-    loadImages();
-  }, [profileData]);
-
-  if (loading) {
-    return (
-      <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ height: "100vh" }}
-      >
-        <Spinner animation="border" variant="light" />
-      </div>
-    );
-  }
-
-  if (!profileData) {
-    return <div>No profile data found.</div>;
-  }
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === preloadedImages.length - 1 ? 0 : prevIndex + 1
+      prevIndex === profileData.profileImages.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? preloadedImages.length - 1 : prevIndex - 1
+      prevIndex === 0 ? profileData.profileImages.length - 1 : prevIndex - 1
     );
   };
 
@@ -103,13 +27,26 @@ const ProfileCard = ({
     setCurrentIndex(index);
   };
 
-  const handleEdit = () => {
-    console.log("clicked");
-  };
-
   const handleBack = () => {
     navigate(`/profile`);
   };
+
+  if (!profileData) {
+    return <div>No profile data found.</div>;
+  }
+
+  const {
+    personalDetails,
+    contactDetails,
+    religiousDetails,
+    astroDetails,
+    familyDetails,
+    educationDetails,
+    employmentDetails,
+    socialMedia,
+    profileImages,
+    address,
+  } = profileData;
 
   return (
     <div className="text-white mb-4" style={{ width: "100%", height: "100vh" }}>
@@ -118,50 +55,18 @@ const ProfileCard = ({
           src="/back.png"
           width={"40px"}
           height={"40px"}
-          style={{
-            marginRight: "10px",
-            // pointerEvents: "none",
-            zIndex: "1",
-          }}
-          alt="LinkedIn"
+          style={{ marginRight: "10px", zIndex: "1" }}
+          alt="Back"
           onClick={handleBack}
         />
       </div>
 
-      <div style={{ display: "flex", float: "right", margin: "20px" }}>
-        {isPreview ? (
-          <img
-            src="/share.png"
-            width={"40px"}
-            height={"40px"}
-            style={{
-              marginRight: "10px",
-              //marginTop: "-570px",
-              pointerEvents: "none",
-              zIndex: "1",
-            }}
-            alt="LinkedIn"
-            //onClick={handleShare}
-          />
-        ) : (
-          <img
-            src="/share.png"
-            width={"40px"}
-            height={"40px"}
-            style={{ marginRight: "10px", marginBottom: "500px", zIndex: "1" }}
-            alt="LinkedIn"
-            //onClick={handleShare}
-          />
-        )}
-      </div>
-
-      {preloadedImages.length > 0 && (
+      {profileImages.length > 0 && (
         <div>
           {/* Image Slider */}
-
           <div
             style={{
-              backgroundImage: `url(${preloadedImages[currentIndex]})`,
+              backgroundImage: `url(${profileImages[currentIndex].name})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               width: "100%",
@@ -170,7 +75,7 @@ const ProfileCard = ({
               transition: "background-image 1s",
             }}
           >
-            {/* Overlay for text */}
+            {/* Profile Details */}
             <div
               className="d-flex flex-column justify-content-center p-3 bg-dark bg-opacity-75"
               style={{
@@ -180,15 +85,11 @@ const ProfileCard = ({
                 width: "100%",
               }}
             >
-              <div
-                className="d-flex"
-                style={{ justifyContent: "space-between" }}
-              >
-                <h2 className="card-title mb-1">
-                  {name}, {age}
-                </h2>
-
-                {isUser ? (
+              <h2 className="card-title mb-1">
+                {personalDetails.first_name} {personalDetails.last_name},{" "}
+                {personalDetails.age}
+              </h2>
+              {/* {isUser ? (
                   <img
                     src="/edit.png"
                     width={"50px"}
@@ -199,9 +100,29 @@ const ProfileCard = ({
                   />
                 ) : (
                   ""
-                )}
-              </div>
-              <p className="card-text mb-1">
+                )} */}
+              {/* <p className="card-text mb-1">
+                <img
+                  src="../religion.png"
+                  width={"20px"}
+                  height={"20px"}
+                  style={{ margin: "5px" }}
+                  alt="location"
+                />
+                {religiousDetails.religion}
+              </p> */}
+              <p className="card-text">
+                <img
+                  src="../office.png"
+                  width={"20px"}
+                  height={"20px"}
+                  style={{ margin: "5px" }}
+                  alt="location"
+                />
+                {employmentDetails.designation} at{" "}
+                {employmentDetails.companyName}
+              </p>
+              <p>
                 <img
                   src="../placeholder.png"
                   width={"20px"}
@@ -209,47 +130,38 @@ const ProfileCard = ({
                   style={{ margin: "5px" }}
                   alt="location"
                 />
-                {location}
+                {address.residential.district}, {address.residential.state}
               </p>
-              <p className="card-text">
-                <img
-                  src="../office.png"
-                  width={"20px"}
-                  height={"20px"}
-                  style={{ margin: "5px" }}
-                  alt="profession"
-                />
-                {profession} at {company}
-              </p>
+
               <div className="d-flex">
-                {instagramUrl && (
+                {socialMedia.instagram && (
                   <img
                     src="../instagram.png"
                     width={"40px"}
                     height={"40px"}
                     style={{ marginRight: "10px" }}
                     alt="Instagram"
-                    onClick={() => window.open(instagramUrl, "_blank")}
+                    onClick={() => window.open(socialMedia.instagram, "_blank")}
                   />
                 )}
-                {facebookUrl && (
+                {socialMedia.facebook && (
                   <img
                     src="../facebook.png"
                     width={"40px"}
                     height={"40px"}
                     style={{ marginRight: "10px" }}
                     alt="Facebook"
-                    onClick={() => window.open(facebookUrl, "_blank")}
+                    onClick={() => window.open(socialMedia.facebook, "_blank")}
                   />
                 )}
-                {linkedInUrl && (
+                {socialMedia.linkedin && (
                   <img
                     src="../linkedin.png"
                     width={"40px"}
                     height={"40px"}
                     style={{ marginRight: "10px" }}
                     alt="LinkedIn"
-                    onClick={() => window.open(linkedInUrl, "_blank")}
+                    onClick={() => window.open(socialMedia.linkedin, "_blank")}
                   />
                 )}
               </div>
@@ -286,7 +198,7 @@ const ProfileCard = ({
               className="d-flex justify-content-center"
               style={{ position: "absolute", bottom: "10px", width: "100%" }}
             >
-              {preloadedImages.map((_, index) => (
+              {profileImages.map((_, index) => (
                 <div
                   key={index}
                   onClick={() => goToSlide(index)}
