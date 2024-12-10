@@ -104,19 +104,6 @@ export const rashiOptions = [
   { label: "Pisces", value: "pisces" },
 ];
 
-export const nakshatraOptions = [
-  { label: "Ashwini", value: "ashwini" },
-  { label: "Bharani", value: "bharani" },
-  { label: "Krittika", value: "krittika" },
-  { label: "Rohini", value: "rohini" },
-  { label: "Mrigashirsha", value: "mrigashirsha" },
-  { label: "Ardra", value: "ardra" },
-  { label: "Punarvasu", value: "punarvasu" },
-  { label: "Pushya", value: "pushya" },
-  { label: "Ashlesha", value: "ashlesha" },
-  { label: "Magha", value: "magha" },
-  // Add more Nakshatras as needed
-];
 
 export const gotraOptions = [
   { label: "Bharadwaj", value: "bharadwaj" },
@@ -161,7 +148,14 @@ export const hobbiesOptions = [
   { label: "Crafting", value: "Crafting" },
 ];
 
-export const financialStatus = ["Middel", "Rich"];
+export const financialStatusOptions = [
+  { label: "Low Income", value: "low_income" },
+  { label: "Middle Income", value: "middle_income" },
+  { label: "Upper Middle Income", value: "upper_middle_income" },
+  { label: "High Income", value: "high_income" },
+  { label: "Affluent", value: "affluent" }
+];
+
 
 export const heightOptions = [{ value: "", label: "Select Height" },
   { value: `4'5"`, label: `4'5"` },
@@ -188,4 +182,51 @@ export const heightOptions = [{ value: "", label: "Select Height" },
   { value: `6'2"`, label: `6'2"` },
   { value: `6'3"`, label: `6'3"` },
   { value: `6'4"`, label: `6'4"` },
-  { value: `6'5"`, label: `6'5"` },]
+  { value: `6'5"`, label: `6'5"` },];
+
+  export const nakshatraOptions = [
+    { label: "Ashwini", value: "ashwini" },
+    { label: "Bharani", value: "bharani" },
+    { label: "Krittika", value: "krittika" },
+    { label: "Rohini", value: "rohini" },
+    { label: "Mrigashira", value: "mrigashira" },
+    { label: "Ardra", value: "ardra" },
+    { label: "Punarvasu", value: "punarvasu" },
+    { label: "Pushya", value: "pushya" },
+    { label: "Ashlesha", value: "ashlesha" },
+    { label: "Magha", value: "magha" },
+    { label: "Purva Phalguni", value: "purva_phalguni" },
+    { label: "Uttara Phalguni", value: "uttara_phalguni" },
+    { label: "Hasta", value: "hasta" },
+    { label: "Chitra", value: "chitra" },
+    { label: "Swati", value: "swati" },
+    { label: "Vishakha", value: "vishakha" },
+    { label: "Anuradha", value: "anuradha" },
+    { label: "Jyeshtha", value: "jyeshtha" },
+    { label: "Mula", value: "mula" },
+    { label: "Purva Ashadha", value: "purva_ashadha" },
+    { label: "Uttara Ashadha", value: "uttara_ashadha" },
+    { label: "Shravana", value: "shravana" },
+    { label: "Dhanishta", value: "dhanishta" },
+    { label: "Shatabhisha", value: "shatabhisha" },
+    { label: "Purva Bhadrapada", value: "purva_bhadrapada" },
+    { label: "Uttara Bhadrapada", value: "uttara_bhadrapada" },
+    { label: "Revati", value: "revati" }
+  ];
+  
+
+  export const occupationOptions = [
+    { label: "Doctor", value: "doctor" },
+    { label: "Engineer", value: "engineer" },
+    { label: "Teacher", value: "teacher" },
+    { label: "Businessman", value: "businessman" },
+    { label: "Government Employee", value: "government_employee" },
+    { label: "Private Employee", value: "private_employee" },
+    { label: "Farmer", value: "farmer" },
+    { label: "Retired", value: "retired" },
+    { label: "Homemaker", value: "homemaker" },
+    { label: "Other", value: "other" }
+  ];
+  
+
+  

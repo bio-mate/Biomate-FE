@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "../../Atoms/CustomButton";
 import ProgressBar from "../../Atoms/ProgressBar";
@@ -16,11 +16,12 @@ import {
   religionOptions,
   rashiOptions,
   nakshatraOptions,
+  occupationOptions,
   gotraOptions,
   incomeOptions,
   employeeInOptions,
   hobbiesOptions,
-  financialStatus,
+  financialStatusOptions,
   heightOptions,
 } from "../../constant/constant";
 
@@ -28,6 +29,10 @@ import "../../styles/PhotoUpload.css";
 import Navbar from "../../components/Navbar";
 import MultiCheckboxTabs from "../../Atoms/MultiCheckboxTabs";
 import TextArea from "../../Atoms/TextArea";
+import { FaFacebook, FaInstagram, FaLinkedin, FaUser } from "react-icons/fa";
+import { IoMdCall } from "react-icons/io";
+import { MdAccountCircle } from "react-icons/md";
+import { CiSearch } from "react-icons/ci";
 
 const Header = styled.div`
   display: flex;
@@ -38,16 +43,19 @@ const Header = styled.div`
 `;
 
 const Footer = styled.div`
-  position: fixed;
   bottom: 20px;
   width: 80%;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-left: 40px;
 `;
 const AddProfile = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+  const [states, setStates] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [stateCityData, setStateCityData] = useState({}); // Full state-city data from API
 
   // States for each section
   const [personalDetails, setPersonalDetails] = useState({
@@ -284,19 +292,63 @@ const AddProfile = () => {
     setPersonalDetails({ ...personalDetails, gender });
     console.log("gender", gender);
   };
-  // const heightOptions = [];
-  // for (let feet = 4; feet <= 7; feet++) {
-  //   for (let inches = 0; inches < 12; inches++) {
-  //     const height = `${feet}'${inches}"`;
-  //     heightOptions.push(height);
-  //     if (feet === 7 && inches === 0) break; // Stop at 7'0"
-  //   }
-  // }
 
+  const token = localStorage.getItem("authToken");
+
+  // Fetch states and districts on component mount
+  useEffect(() => {
+    const fetchStatesAndCities = async () => {
+      try {
+        const response = await axios.get(`/mate/api/v1/global/state-city`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = response.data.data.stateCities; // Extract state-city data
+        setStateCityData(data); // Save the entire structure
+        setStates(Object.keys(data)); // Extract state names as keys
+      } catch (error) {
+        console.error("Error fetching state-city data:", error);
+      }
+    };
+
+    fetchStatesAndCities();
+  }, [token]);
+
+  // Handle state selection
+  const handleStateChange = (e) => {
+    const selectedState = e.target.value;
+
+    // Update state in the address and reset district
+    setAddress((prevAddress) => ({
+      ...prevAddress,
+      residential: { ...prevAddress.residential, state: selectedState, district: "" },
+    }));
+
+    // Update the districts dropdown based on the selected state
+    if (selectedState && stateCityData[selectedState]) {
+      setDistricts(stateCityData[selectedState]); // Districts for the selected state
+    } else {
+      setDistricts([]); // Clear districts if no state is selected
+    }
+  };
+
+  // Handle district selection
+  const handleDistrictChange = (e) => {
+    const selectedDistrict = e.target.value;
+
+    // Update district in the address
+    setAddress((prevAddress) => ({
+      ...prevAddress,
+      residential: { ...prevAddress.residential, district: selectedDistrict },
+    }));
+  };
+  console.log("district", districts)
   return (
     <>
       <Navbar />
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
         {step > 1 && (
           <Header>
             <div onClick={handlePrevious}>
@@ -338,6 +390,7 @@ const AddProfile = () => {
               error={errors.last_name}
               required
             />
+            <label style={{ marginBottom: "10px" }}>Select Gender</label>
             <IconRadioGroup
               label="Select Gender"
               name="gender"
@@ -352,58 +405,74 @@ const AddProfile = () => {
         {/* Age */}
         {step === 2 && (
           <div>
-            {/* <img src="/age.png" alt="Age" className="step-icon" /> */}
-            <TextInput
-              label="Age"
-              name="age"
-              type="number"
-              value={personalDetails.age}
-              onChange={(e) => handleChange(e, setPersonalDetails)}
-              error={errors.age}
-              required
-            />
-            <div>
-              {/* <img src="/height.png" alt="Height" className="step-icon" /> */}
-              <DropdownInput
-                label="Height"
-                name="height"
-                value={personalDetails.height}
-                onChange={(e) => handleChange(e, setPersonalDetails)}
-                options={heightOptions}
-                error={errors.height}
-                required
-              />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <div style={{ width: "45%" }}>
+                <TextInput
+                  label="Age"
+                  name="age"
+                  type="number"
+                  value={personalDetails.age}
+                  onChange={(e) => handleChange(e, setPersonalDetails)}
+                  error={errors.age}
+                  required
+                />
+              </div>
+              <div style={{ width: "45%" }}>
+                <TextInput
+                  label="Weight"
+                  name="weight"
+                  type="number"
+                  value={personalDetails.weight}
+                  onChange={(e) => handleChange(e, setPersonalDetails)}
+                  error={errors.weight}
+                  required
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <div>
+                <DropdownInput
+                  label="Height"
+                  name="height"
+                  value={personalDetails.height}
+                  onChange={(e) => handleChange(e, setPersonalDetails)}
+                  options={heightOptions}
+                  error={errors.height}
+                  required
+                />
+              </div>
+              <div>
+                <DropdownInput
+                  label="Blood Group"
+                  name="blood_group"
+                  value={personalDetails.blood_group}
+                  onChange={(e) => handleChange(e, setPersonalDetails)}
+                  options={bloodGroups}
+                  error={errors.blood_group}
+                  required
+                />
+              </div>
             </div>
             <div>
-              {/* <img src="/weight.png" alt="Weight" className="step-icon" /> */}
-              <TextInput
-                label="Weight"
-                name="weight"
-                type="number"
-                value={personalDetails.weight}
-                onChange={(e) => handleChange(e, setPersonalDetails)}
-                error={errors.weight}
-                required
-              />
-            </div>
-            <div>
-              {/* <img src="/skin-care.png" alt="Complexion" className="step-icon" /> */}
+              <label style={{ marginBottom: "10px" }}>Select Complexion</label>
               <IconRadioGroup
                 label="Select Complexion"
                 options={complexions}
                 selectedValue={personalDetails.complexion}
                 onChange={handleComplexionSelect}
                 error={errors.complexion}
-              />
-            </div>
-            <div>
-              {/* <img src="/blood.png" alt="Blood Group" className="step-icon" /> */}
-              <IconRadioGroup
-                label="Blood Group"
-                options={bloodGroups}
-                selectedValue={personalDetails.blood_group}
-                onChange={handleBloodGroupSelect}
-                error={errors.blood_group}
               />
             </div>
           </div>
@@ -458,15 +527,7 @@ const AddProfile = () => {
           <div>
             <img src="/astrology.png" alt="Astrology" className="step-icon" />
             <h3>Astro Details</h3>
-            <TextInput
-              label="Date of Birth"
-              name="dob"
-              type="date"
-              value={astroDetails.dob}
-              onChange={(e) => handleChange(e, setAstroDetails)}
-              error={errors.dob}
-              required
-            />
+
             <TextInput
               label="Place of Birth"
               name="pob"
@@ -475,27 +536,61 @@ const AddProfile = () => {
               error={errors.pob}
               required
             />
-            <TextInput
-              label="Time of Birth"
-              name="tob"
-              type="time"
-              value={astroDetails.tob}
-              onChange={(e) => handleChange(e, setAstroDetails)}
-            />
-            <DropdownInput
-              label="Select Rashi"
-              name="rashi"
-              value={astroDetails.rashi}
-              onChange={(e) => handleChange(e, setAstroDetails)}
-              options={rashiOptions}
-              error={errors.rashi}
-            />
-            <TextInput
-              label="Nakshatra"
-              name="nakshatra"
-              value={astroDetails.nakshatra}
-              onChange={(e) => handleChange(e, setAstroDetails)}
-            />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <TextInput
+                label="Date of Birth"
+                name="dob"
+                type="date"
+                value={astroDetails.dob}
+                onChange={(e) => handleChange(e, setAstroDetails)}
+                error={errors.dob}
+                required
+              />
+              <div
+                style={{
+                  width: "50%",
+                }}
+              >
+                <TextInput
+                  label="Time of Birth"
+                  name="tob"
+                  type="time"
+                  value={astroDetails.tob}
+                  onChange={(e) => handleChange(e, setAstroDetails)}
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <DropdownInput
+                label="Select Rashi"
+                name="rashi"
+                value={astroDetails.rashi}
+                onChange={(e) => handleChange(e, setAstroDetails)}
+                options={rashiOptions}
+                error={errors.rashi}
+              />
+              <DropdownInput
+                label="Select Nakshatra"
+                name="nakshatra"
+                value={astroDetails.nakshatra} // State value for nakshatra
+                onChange={(e) => handleChange(e, setAstroDetails)} // Your handler function
+                options={nakshatraOptions}
+                error={errors.nakshatra} // Validation error message, if any
+                required
+              />
+            </div>
           </div>
         )}
 
@@ -518,48 +613,88 @@ const AddProfile = () => {
               value={familyDetails.motherName}
               onChange={(e) => handleChange(e, setFamilyDetails)}
             />
-            <TextInput
-              label="Father's Occupation"
-              name="fatherOccupation"
-              value={familyDetails.fatherOccupation}
-              onChange={(e) => handleChange(e, setFamilyDetails)}
-            />
-            <TextInput
-              label="Mother's Occupation"
-              name="motherOccupation"
-              value={familyDetails.motherOccupation}
-              onChange={(e) => handleChange(e, setFamilyDetails)}
-            />
-            <TextInput
-              label="No. of Brothers"
-              name="noOfBrothers"
-              type="number"
-              value={familyDetails.noOfBrothers}
-              onChange={(e) => handleChange(e, setFamilyDetails)}
-            />
-            <TextInput
-              label="No. of Sisters"
-              name="noOfSisters"
-              type="number"
-              value={familyDetails.noOfSisters}
-              onChange={(e) => handleChange(e, setFamilyDetails)}
-            />
-            <DropdownInput
-              label="Family Financial Status"
-              name="familyFinancialStatus"
-              value={familyDetails.familyFinancialStatus}
-              onChange={(e) => handleChange(e, setFamilyDetails)}
-              options={financialStatus}
-              error={errors.familyFinancialStatus}
-            />
-            <DropdownInput
-              label="Family Income Range"
-              name="familyIncome"
-              value={familyDetails.familyIncome}
-              onChange={(e) => handleChange(e, setFamilyDetails)}
-              options={incomeOptions}
-              error={errors.familyIncome}
-            />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <div style={{ width: "45%" }}>
+                <DropdownInput
+                  label="Father's Occupation"
+                  name="fatherOccupation"
+                  value={familyDetails.fatherOccupation}
+                  onChange={(e) => handleChange(e, setFamilyDetails)}
+                  options={occupationOptions}
+                  error={errors.fatherOccupation}
+                />
+              </div>
+              <div style={{ width: "45%" }}>
+                <DropdownInput
+                  label="Mother's Occupation"
+                  name="motherOccupation"
+                  value={familyDetails.motherOccupation}
+                  onChange={(e) => handleChange(e, setFamilyDetails)}
+                  options={occupationOptions}
+                  error={errors.motherOccupation}
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <div style={{ width: "45%" }}>
+                <TextInput
+                  label="No. of Brothers"
+                  name="noOfBrothers"
+                  type="number"
+                  value={familyDetails.noOfBrothers}
+                  onChange={(e) => handleChange(e, setFamilyDetails)}
+                />
+              </div>
+              <div style={{ width: "45%" }}>
+                <TextInput
+                  label="No. of Sisters"
+                  name="noOfSisters"
+                  type="number"
+                  value={familyDetails.noOfSisters}
+                  onChange={(e) => handleChange(e, setFamilyDetails)}
+                />
+              </div>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <div style={{ width: "45%" }}>
+                <DropdownInput
+                  label="Family Financial Status"
+                  name="familyFinancialStatus"
+                  value={familyDetails.familyFinancialStatus}
+                  onChange={(e) => handleChange(e, setFamilyDetails)}
+                  options={financialStatusOptions}
+                  error={errors.familyFinancialStatus}
+                />
+              </div>
+              <div style={{ width: "45%" }}>
+                <DropdownInput
+                  label="Family Income Range"
+                  name="familyIncome"
+                  value={familyDetails.familyIncome}
+                  onChange={(e) => handleChange(e, setFamilyDetails)}
+                  options={incomeOptions}
+                  error={errors.familyIncome}
+                />
+              </div>
+            </div>
           </div>
         )}
 
@@ -627,7 +762,7 @@ const AddProfile = () => {
           </div>
         )}
         {/* Address Details */}
-        {step === 8 && (
+        {/* {step === 8 && (
           <div>
             <div>
               <img
@@ -645,20 +780,32 @@ const AddProfile = () => {
               />
 
               <h4>Residential Address</h4>
-              <TextInput
-                label="State"
-                name="residential.state"
-                type="text" // Assuming TextInput can handle type
-                value={address.residential.state}
-                onChange={(e) => handleAddressChange(e, setAddress)}
-              />
-              <TextInput
-                label="District"
-                name="residential.district"
-                type="text" // Assuming TextInput can handle type
-                value={address.residential.district}
-                onChange={(e) => handleAddressChange(e, setAddress)}
-              />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <div style={{ width: "45%" }}>
+                  <TextInput
+                    label="State"
+                    name="residential.state"
+                    type="text" // Assuming TextInput can handle type
+                    value={address.residential.state}
+                    onChange={(e) => handleAddressChange(e, setAddress)}
+                  />
+                </div>
+                <div style={{ width: "45%" }}>
+                  <TextInput
+                    label="District"
+                    name="residential.district"
+                    type="text" // Assuming TextInput can handle type
+                    value={address.residential.district}
+                    onChange={(e) => handleAddressChange(e, setAddress)}
+                  />
+                </div>
+              </div>
               <TextInput
                 label="Pin-Code"
                 name="residential.pinCode"
@@ -676,20 +823,32 @@ const AddProfile = () => {
               />
 
               <h4>Permanent Address</h4>
-              <TextInput
-                label="State"
-                name="permanent.state"
-                type="text" // Assuming TextInput can handle type
-                value={address.permanent.state}
-                onChange={(e) => handleAddressChange(e, setAddress)}
-              />
-              <TextInput
-                label="District"
-                name="permanent.district"
-                type="text" // Assuming TextInput can handle type
-                value={address.permanent.district}
-                onChange={(e) => handleAddressChange(e, setAddress)}
-              />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <div style={{ width: "45%" }}>
+                  <TextInput
+                    label="State"
+                    name="permanent.state"
+                    type="text" // Assuming TextInput can handle type
+                    value={address.permanent.state}
+                    onChange={(e) => handleAddressChange(e, setAddress)}
+                  />
+                </div>
+                <div style={{ width: "45%" }}>
+                  <TextInput
+                    label="District"
+                    name="permanent.district"
+                    type="text" // Assuming TextInput can handle type
+                    value={address.permanent.district}
+                    onChange={(e) => handleAddressChange(e, setAddress)}
+                  />
+                </div>
+              </div>
               <TextInput
                 label="Pin-Code"
                 name="permanent.pinCode"
@@ -707,7 +866,168 @@ const AddProfile = () => {
               />
             </div>
           </div>
+        )} */}
+        {step === 8 && (
+          <div>
+            <div>
+              <img
+                src="/placeholder.png"
+                alt="Male"
+                style={{ width: "50px", marginBottom: "20px" }}
+              />
+              <h3>Address Details</h3>
+
+              <TextInput
+                label="Native Place"
+                name="nativePlace"
+                type="text"
+                onChange={(e) => handleChange(e, setAddress)}
+              />
+
+              <h4>Residential Address</h4>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                
+                <div style={{display:'flex'}}>
+                  <div style={{ width: "45%", marginBottom: "20px", marginRight:'20px' }}>
+                    <label htmlFor="state">State</label>
+                    <select
+                      id="state"
+                      name="residential.state"
+                      value={address.residential.state}
+                      onChange={handleStateChange}
+                      className="form-control"
+                    >
+                      <option value="">Select a State</option>
+                      {states.map((state) => (
+                        <option key={state} value={state}>
+                          {state}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div style={{ width: "45%" }}>
+                    <label htmlFor="district">District</label>
+                    <select
+                      id="district"
+                      name="residential.district"
+                      value={address.residential.district}
+                      onChange={handleDistrictChange}
+                      className="form-control"
+                      disabled={!address.residential.state}
+                    >
+                      <option value="">Select a District</option>
+                      {districts.map((district, index) => (
+                        <option key={index} value={district.name}>
+                          {district.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <TextInput
+                label="Pin-Code"
+                name="residential.pinCode"
+                type="text"
+                value={address.residential.pinCode}
+                onChange={(e) => handleAddressChange(e, setAddress)}
+              />
+
+              <TextInput
+                label="Address Line"
+                name="residential.addressLine"
+                type="text"
+                value={address.residential.addressLine}
+                onChange={(e) => handleAddressChange(e, setAddress)}
+              />
+
+              <div style={{ marginTop: "20px" }}>
+                <label style={{ display: "flex" }}>
+                  <input
+                    type="checkbox"
+                    style={{
+                      marginRight: "8px",
+                      width: "10%",
+                      padding: "20px",
+                    }}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setAddress((prev) => ({
+                          ...prev,
+                          permanent: { ...prev.residential },
+                        }));
+                      } else {
+                        setAddress((prev) => ({
+                          ...prev,
+                          permanent: {
+                            state: "",
+                            district: "",
+                            pinCode: "",
+                            addressLine: "",
+                          },
+                        }));
+                      }
+                    }}
+                  />
+                  <span style={{ width: "100%" }}>
+                    {" "}
+                    Same as Residential Address
+                  </span>
+                </label>
+              </div>
+
+              <h4>Permanent Address</h4>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <div style={{ width: "45%" }}>
+                  <TextInput
+                    label="State"
+                    name="permanent.state"
+                    type="text"
+                    value={address.permanent.state}
+                    onChange={(e) => handleAddressChange(e, setAddress)}
+                  />
+                </div>
+                <div style={{ width: "45%" }}>
+                  <TextInput
+                    label="District"
+                    name="permanent.district"
+                    type="text"
+                    value={address.permanent.district}
+                    onChange={(e) => handleAddressChange(e, setAddress)}
+                  />
+                </div>
+              </div>
+              <TextInput
+                label="Pin-Code"
+                name="permanent.pinCode"
+                type="text"
+                value={address.permanent.pinCode}
+                onChange={(e) => handleAddressChange(e, setAddress)}
+              />
+
+              <TextInput
+                label="Address Line"
+                name="permanent.addressLine"
+                type="text"
+                value={address.permanent.addressLine}
+                onChange={(e) => handleAddressChange(e, setAddress)}
+              />
+            </div>
+          </div>
         )}
+
         {/* Contact  Details */}
         {step === 9 && (
           <div>
@@ -717,6 +1037,7 @@ const AddProfile = () => {
               style={{ width: "50px", marginBottom: "20px" }}
             />
             <TextInput
+              icon={<IoMdCall />}
               label="Parent Contact no"
               name="parentNumber"
               type="number" // Assuming TextInput can handle type
@@ -724,6 +1045,7 @@ const AddProfile = () => {
               onChange={(e) => handleChange(e, setContactDetails)}
             />
             <TextInput
+              icon={<IoMdCall />}
               label="Self Contact no"
               name="selfNumber"
               type="number" // Assuming TextInput can handle type
@@ -732,6 +1054,7 @@ const AddProfile = () => {
             />
             <h3>Social Media Links</h3>
             <TextInput
+              icon={<FaFacebook />}
               label="Facebook"
               name="facebook"
               value={socialMedia.facebook}
@@ -741,6 +1064,7 @@ const AddProfile = () => {
               error={errors.facebook}
             />
             <TextInput
+              icon={<FaLinkedin />}
               label="LinkedIn"
               name="linkedin"
               value={socialMedia.linkedin}
@@ -750,6 +1074,7 @@ const AddProfile = () => {
               error={errors.linkedin}
             />
             <TextInput
+              icon={<FaInstagram />}
               label="Instagram"
               name="instagram"
               value={socialMedia.instagram}
@@ -770,6 +1095,8 @@ const AddProfile = () => {
                 style={{ width: "50px", marginBottom: "20px" }}
               />
               <h3>Lifestyle Details</h3>
+
+              {/* Diet Dropdown Input */}
               <DropdownInput
                 label="Diet"
                 name="diet"
@@ -784,31 +1111,39 @@ const AddProfile = () => {
                 error={errors.diet}
               />
             </div>
+
+            {/* Hobbies Section */}
             {/* <div>
-              <img
-                src="/hobbies.png"
-                alt="Hobbies"
-                style={{ width: "50px", marginBottom: "20px" }}
+              <label style={{ fontSize: "16px", fontWeight: "bold" }}>
+                Select Hobbies (max 10)
+              </label>
+
+              
+              <MultiCheckboxTabs
+                options={hobbiesOptions}
+                selectedOptions={personalDetails.hobbies}
+                onChange={(newHobbies) =>
+                  setPersonalDetails((prev) => ({
+                    ...prev,
+                    hobbies: newHobbies,
+                  }))
+                }
+                maxSelection={10}
               />
-              <div>
-                <label>Select Hobbies (max 10)</label>
-                <MultiCheckboxTabs
-                  options={hobbiesOptions}
-                  selectedOptions={personalDetails.hobbies}
-                  onChange={(newHobbies) =>
-                    setPersonalDetails((prev) => ({
-                      ...prev,
-                      hobbies: newHobbies,
-                    }))
-                  }
-                  maxSelection={10}
-                />
-                {errors.hobbies && (
-                  <p style={{ color: "red", fontSize: "12px" }}>
-                    {errors.hobbies}
-                  </p>
-                )}
-              </div>
+
+            
+              {errors.hobbies && (
+                <p
+                  style={{
+                    color: "red",
+                    fontSize: "12px",
+                    marginTop: "5px",
+                    marginBottom: "0", // Remove space below error message
+                  }}
+                >
+                  {errors.hobbies}
+                </p>
+              )}
             </div> */}
           </>
         )}
@@ -817,13 +1152,9 @@ const AddProfile = () => {
         {step === 11 && (
           <>
             <div>
-              <img
-                src="/feedback.png"
-                alt="Feedback"
-                style={{ width: "50px", marginBottom: "20px" }}
-              />
               <TextArea
-                label="Provide Your Feedback"
+                icon={<MdAccountCircle />}
+                label="About Me"
                 value={personalDetails.aboutMe}
                 onChange={(value) =>
                   setPersonalDetails((prev) => ({
@@ -836,12 +1167,8 @@ const AddProfile = () => {
                 error={errors.aboutMe}
               />
               <div>
-                <img
-                  src="/feedback.png"
-                  alt="Looking For"
-                  style={{ width: "50px", marginBottom: "20px" }}
-                />
                 <TextArea
+                  icon={<CiSearch />}
                   label="What are you looking for?"
                   value={personalDetails.lookingFor}
                   onChange={(value) =>
@@ -928,25 +1255,24 @@ const AddProfile = () => {
             </div>
           </div>
         )}
-
-        <div>
-          <Footer>
-            {step < 13 ? (
-              <CustomButton
-                type="primary"
-                onClick={handleNext}
-                label={"Next"}
-              ></CustomButton>
-            ) : (
-              <CustomButton
-                type="primary"
-                onClick={handleSubmit}
-                label={"Submit"}
-              ></CustomButton>
-            )}
-          </Footer>
-        </div>
       </form>
+      <div>
+        <Footer>
+          {step < 13 ? (
+            <CustomButton
+              type="primary"
+              onClick={handleNext}
+              label={"Next"}
+            ></CustomButton>
+          ) : (
+            <CustomButton
+              type="primary"
+              onClick={handleSubmit}
+              label={"Submit"}
+            ></CustomButton>
+          )}
+        </Footer>
+      </div>
     </>
   );
 };

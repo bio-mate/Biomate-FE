@@ -60,11 +60,22 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
   if (!profile) {
     return <div>No profile available.</div>;
   }
-console.log("profileData", profile)
+
+  const formatDate = (date) => {
+    if (!date) return "N/A"; // Handle empty or undefined date
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) return "N/A"; // Handle invalid date format
+    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
+    const year = parsedDate.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+  console.log("profileData", profile);
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center">
       <ProfileCard
-      profileData={profile}
+        profileData={profile}
+        isUser={true}
         userId={profile._id}
         isPreview={edit}
         name={`${profile.personalDetails?.first_name || "N/A"} ${
@@ -92,7 +103,7 @@ console.log("profileData", profile)
         caste={profile.religiousDetails?.caste || "N/A"}
         subCaste={profile.religiousDetails?.subCaste || "N/A"}
         language={profile.religiousDetails?.language || "N/A"}
-        dateOfBirth={profile.astroDetails?.dob || "N/A"}
+        dateOfBirth={formatDate(profile.astroDetails?.dob) || "N/A"}
         placeOfBirth={profile.astroDetails?.pob || "N/A"}
         timeOfBirth={profile.astroDetails?.tob || "N/A"}
         rashi={profile.astroDetails?.rashi || "N/A"}
@@ -131,7 +142,10 @@ console.log("profileData", profile)
         lookingFor={profile.personalDetails?.lookingFor}
       />
 
-      <KundaliCard userId={profile._id} preloadedImages={profile.kundaliImages[0].name}/>
+      <KundaliCard
+        userId={profile._id}
+        preloadedImages={profile.kundaliImages[0].name}
+      />
 
       {edit && !isPreviewPage && (
         <Link to={`/edit-profile/${profile._id}`}>

@@ -7,6 +7,13 @@ const TextAreaWrapper = styled.div`
   gap: 8px;
 `;
 
+const LabelWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+`;
+
 const StyledTextArea = styled.textarea`
   width: 100%;
   min-height: 150px;
@@ -35,12 +42,16 @@ const ErrorMessage = styled.p`
   margin: 0;
 `;
 
-const TextArea = ({ value, onChange, maxWords = 1000, placeholder, error }) => {
+const TextArea = ({ label, value, onChange, maxWords = 1000, placeholder, error, icon }) => {
   const wordCount = value.trim().split(/\s+/).filter((word) => word).length;
   const exceedLimit = wordCount > maxWords;
 
   return (
     <TextAreaWrapper>
+      <LabelWrapper>
+        {icon && <span>{icon}</span>}
+        <label>{label}</label>
+      </LabelWrapper>
       <StyledTextArea
         value={value}
         onChange={(e) => {

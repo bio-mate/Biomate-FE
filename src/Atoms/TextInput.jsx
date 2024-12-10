@@ -35,6 +35,19 @@ const ErrorMessage = styled.p`
   margin-top: 5px;
 `;
 
+const LabelContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+`;
+
+const IconWrapper = styled.span`
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  font-size: 20px; /* Adjust the size of the icon as needed */
+`;
+
 const TextInput = ({ 
   label, 
   name, 
@@ -42,13 +55,18 @@ const TextInput = ({
   value, 
   onChange, 
   error, 
-  required = false 
+  required = false ,
+  icon
 }) => (
   <InputContainer>
-    <Label htmlFor={name}>
-      {label}
-      {required && <RequiredIndicator>*</RequiredIndicator>}
-    </Label>
+  <LabelContainer>
+      {icon && <IconWrapper>{icon}</IconWrapper>}
+      <Label htmlFor={name}>
+        {label}
+        {required && <RequiredIndicator>*</RequiredIndicator>}
+      </Label>
+    </LabelContainer>
+   
     <StyledInput
       id={name}
       name={name}

@@ -3,8 +3,9 @@ import styled from "styled-components";
 import PropTypes from "prop-types";
 
 const RadioGroupContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two items per row */
+  gap: 20px; /* Space between items */
   margin-bottom: 20px;
 `;
 
@@ -13,20 +14,18 @@ const RadioOption = styled.label`
   align-items: center;
   cursor: pointer;
   padding: 10px;
-  margin: 10px 0;
   border: ${({ isSelected }) => (isSelected ? "2px solid blue" : "1px solid gray")};
   border-radius: 5px;
-  width: 100%;
   transition: border-color 0.3s;
   background-color: ${({ isSelected }) => (isSelected ? "#f0f8ff" : "transparent")};
-
+  
   img {
     width: 50px;
     margin-right: 10px;
   }
 
   input {
-    display: none; // Hide the default radio button appearance
+    display: none; /* Hide the default radio button appearance */
   }
 
   span {
@@ -34,10 +33,9 @@ const RadioOption = styled.label`
   }
 `;
 
-const IconRadioGroup = ({ label, options, selectedValue, onChange, error }) => {
+const IconRadioGroup = ({ options, selectedValue, onChange, error }) => {
   return (
     <RadioGroupContainer>
-      <h3>{label}</h3>
       {options.map((option) => (
         <RadioOption
           key={option.value}
@@ -45,7 +43,7 @@ const IconRadioGroup = ({ label, options, selectedValue, onChange, error }) => {
         >
           <input
             type="radio"
-            name={label}
+            name="radio-group"
             value={option.value}
             checked={selectedValue === option.value}
             onChange={() => onChange(option.value)}
@@ -60,7 +58,6 @@ const IconRadioGroup = ({ label, options, selectedValue, onChange, error }) => {
 };
 
 IconRadioGroup.propTypes = {
-  label: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
