@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import useAuth from "../../context/useAuth";
 import ProfileCard from "../../components/ProfileCard";
 import DetailsPage from "../../components/PersonalDetails";
 import Footer from "../../components/Footer";
@@ -9,7 +8,7 @@ import KundaliCard from "../../components/KundaliCard";
 import { useParams } from "react-router-dom";
 
 const ViewProfile = ({ edit = true, isPreviewPage }) => {
-  const { user } = useAuth();
+  
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -148,7 +147,7 @@ const ViewProfile = ({ edit = true, isPreviewPage }) => {
       />
 
       {edit && !isPreviewPage && (
-        <Link to={`/edit-profile/${profile._id}`}>
+        <Link to={`/update-profile/${profile._id}`}>
           <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
             Edit Profile
           </button>

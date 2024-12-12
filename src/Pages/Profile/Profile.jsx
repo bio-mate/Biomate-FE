@@ -1,33 +1,27 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa";
-import useAuth from "../../context/useAuth";
+
 import AddProfileCard from "../../components/AddProfileCard";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
+import { toast } from "react-toastify";
 
 const Profile = () => {
-  const { user } = useAuth(); // Access user and token from context
+ 
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-console.log("useruser",user)
-const token = localStorage.getItem("authToken");
-// useEffect(() => {
-//   // Fetch token from localStorage
-//   const storedToken = localStorage.getItem("authToken");
-//   if (storedToken) {
-//     setToken(storedToken);
-//   } else {
-//     console.warn("No token found in localStorage");
-//   }
-// }, []); // Run once on component mount
+
+  const token = localStorage.getItem("authToken");
+
   useEffect(() => {
     const fetchProfiles = async () => {
       if (!token) {
-        navigate('/unauthorized')
         setError("User is not authenticated. Please log in.");
+        toast.error("User is not authenticated. Redirecting...");
+        navigate("/unauthorized");
         setLoading(false);
         return;
       }
@@ -39,26 +33,28 @@ const token = localStorage.getItem("authToken");
           },
         });
 
-        const fetchedProfiles = response.data?.data?.profile || [];
-        console.log("response.data?.data?.profile",response.data?.data?.profile.profileImages[0].name)
-        if (fetchedProfiles.length > 0) {
+        if (response.data?.data?.profile) {
+          const fetchedProfiles = response.data.data.profile;
           setProfiles(fetchedProfiles);
+          toast.success("Profiles fetched successfully!");
         } else {
           setError("No profiles found.");
+          toast.info("No profiles available.");
         }
       } catch (err) {
-        setError(
+        const errorMessage =
           err.response?.data?.message ||
-            "Could not fetch profiles. Please try again later."
-        );
-        navigate(`/error`)
+          "Could not fetch profiles. Please try again later.";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        navigate("/error");
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfiles();
-  }, [token]);
+  }, [token, navigate]);
 
   const handleClick = () => {
     navigate("/addProfile");
@@ -76,15 +72,7 @@ const token = localStorage.getItem("authToken");
     <>
       <Navbar />
       <div className="container mt-4">
-        {/* {user && (
-          <div className="mb-4">
-            <h2>Welcome, {user.firstName}!</h2>
-            <p>Email: {user.email}</p>
-          </div>
-        )} */}
-
         <div className="d-flex justify-content-between align-items-center mb-4">
-          {/* <h1>Profiles</h1> */}
           <button
             className="btn btn-success d-flex align-items-center"
             onClick={handleClick}
@@ -96,7 +84,7 @@ const token = localStorage.getItem("authToken");
         <div className="row">
           {profiles.length > 0 ? (
             profiles.map((profile) => (
-              <div className="col-md-4 mb-4" key={profile.id}>
+              <div className="col-md-4 mb-4" key={profile._id}>
                 <AddProfileCard
                   userId={profile.id}
                   name={`${profile.personalDetails?.first_name || "N/A"} ${
@@ -108,8 +96,8 @@ const token = localStorage.getItem("authToken");
                   }, ${profile.contactInformation?.address?.country || "N/A"}`}
                   profession={profile.employmentDetails?.designation || "N/A"}
                   company={profile.employmentDetails?.companyName || "N/A"}
-                  id = {profile._id}
-                  profileImage = {profile.profileImages[0].name}
+                  id={profile._id}
+                  profileImage={profile.profileImages?.[0]?.name || ""}
                 />
               </div>
             ))

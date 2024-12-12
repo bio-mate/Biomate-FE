@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import ViewProfile from "./ViewProfile";
 
-const UserPreviewPage = () => {
+const PreviewProfile = () => {
   const [showPreview, setShowPreview] = useState(true);
   
   const demoPage = "https://rzp.io/rzp/90tjveeR";
@@ -68,5 +68,5 @@ const UserPreviewPage = () => {
   );
 };
 
-export default UserPreviewPage;
+export default PreviewProfile;
 

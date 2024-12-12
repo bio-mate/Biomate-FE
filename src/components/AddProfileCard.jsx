@@ -13,12 +13,12 @@ const AddProfileCard = ({
   profession,
   company,
   id,
-  profileImage
+  profileImage,
 }) => {
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
   const [preloadedImages, setPreloadedImages] = useState([]);
-  
+
   const navigate = useNavigate();
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -37,21 +37,6 @@ const AddProfileCard = ({
     fetchProfileData();
   }, [userId]);
 
-  // useEffect(() => {
-  //   const loadImages = async () => {
-  //     if (
-  //       profileData &&
-  //       profileData.profileImages &&
-  //       profileData.profileImages.length > 0
-  //     ) {
-  //       const firstImageUrl = `http://localhost:4000/${profileData.profileImages[0].imageUrl}`;
-  //       setPreloadedImages([firstImageUrl]); // Store only the first image
-  //     }
-  //   };
-
-  //   loadImages();
-  // }, [profileData]);
-
   if (loading) {
     return (
       <div
@@ -64,11 +49,11 @@ const AddProfileCard = ({
   }
 
   const handleEdit = () => {
-    navigate(`/edit-profile/${id}`);
+    navigate(`/update-profile/${id}`);
   };
 
   const handleView = () => {
-    navigate(`/user-profile/${id}`);
+    navigate(`/view-profile/${id}`);
   };
 
   return (

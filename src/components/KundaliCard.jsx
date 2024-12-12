@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { IoIosArrowDroprightCircle, IoIosArrowDropleftCircle } from "react-icons/io";
+import {
+  IoIosArrowDroprightCircle,
+  IoIosArrowDropleftCircle,
+} from "react-icons/io";
 import { Spinner } from "react-bootstrap";
 import axios from "axios";
 
@@ -9,7 +12,7 @@ const KundaliCard = ({ userId, token, preloadedImages }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   // const [preloadedImages, setPreloadedImages] = useState([]);
-console.log("preloadedImagespreloadedImages",preloadedImages)
+
   // Fetch the profile and extract Kundali images
   // useEffect(() => {
   //   const fetchKundaliImages = async () => {
@@ -64,7 +67,10 @@ console.log("preloadedImagespreloadedImages",preloadedImages)
   // Handle error state
   if (error) {
     return (
-      <div className="d-flex justify-content-center align-items-center text-danger" style={{ height: "100vh" }}>
+      <div
+        className="d-flex justify-content-center align-items-center text-danger"
+        style={{ height: "100vh" }}
+      >
         {error}
       </div>
     );
@@ -73,7 +79,10 @@ console.log("preloadedImagespreloadedImages",preloadedImages)
   // Handle no images
   if (preloadedImages.length === 0) {
     return (
-      <div className="d-flex justify-content-center align-items-center text-warning" style={{ height: "100vh" }}>
+      <div
+        className="d-flex justify-content-center align-items-center text-warning"
+        style={{ height: "100vh" }}
+      >
         No Kundali images found.
       </div>
     );
@@ -108,7 +117,7 @@ console.log("preloadedImagespreloadedImages",preloadedImages)
           transition: "background-image 1s",
         }}
       >
-        <img src={preloadedImages} alt={preloadedImages}/>
+        <img src={preloadedImages} alt={preloadedImages} />
         {/* Navigation Buttons */}
         <div
           className="position-absolute"

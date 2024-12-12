@@ -12,7 +12,6 @@ const Footer = () => {
       className="fixed bottom-0 left-0 right-0 flex justify-around items-center py-2 shadow-lg z-50 mt-5"
       style={{ background: colors.Red }}
     >
-      {/* Home */}
       <div
         className="flex flex-col items-center cursor-pointer"
         style={{ color: "white", fontSize: "20px", textAlign: "center" }}

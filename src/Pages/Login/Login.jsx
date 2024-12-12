@@ -1,6 +1,5 @@
-// src/Login.js
 import React, { useState } from "react";
-import { fetchData } from "../../utils/api";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -45,18 +44,23 @@ const Login = () => {
     }
 
     try {
-      const { success } = await fetchData(
-        "/mate/api/v1/auth/otp/send",
-        "POST",
-        { mobile }
+      const response = await axios.post(
+        "http://localhost:3000/mate/api/v1/auth/otp/send",
+        { mobile },
+        { headers: { "Content-Type": "application/json" } }
       );
-      if (success) {
-        toast.success("OTP sent successfully!");
-        setOtpSent(true);
+
+      // Check for success response
+      if (response.data && !response.data.isError) {
+        toast.success(response.data.message || "OTP sent successfully!");
+        setOtpSent(true); // Show the OTP input field
       } else {
-        toast.error("Failed to send OTP. Please try again.");
+        toast.error(
+          response.data.message || "Failed to send OTP. Please try again."
+        );
       }
     } catch (err) {
+      console.error(err);
       toast.error("Error sending OTP. Please try again later.");
     }
   };
@@ -70,23 +74,24 @@ const Login = () => {
     }
 
     try {
-      const { success, token } = await fetchData(
-        "/mate/api/v1/users/generate-token",
-        "POST",
-        { mobile, code: otp }
+      const response = await axios.post(
+        "http://localhost:3000/mate/api/v1/users/generate-token",
+        { mobile, code: otp },
+        { headers: { "Content-Type": "application/json" } }
       );
-      if (success) {
+      console.log("data", response.data);
+      if (!response.data.isError && typeof response.data.data.token === "string") {
         toast.success("Login successful!");
+        const { token } = response.data.data;
         localStorage.setItem("authToken", token);
-        login({ mobile, token }); // Store user credentials in context
-        setMobile("");
-        setOtp("");
-        setOtpSent(false);
-        navigate("/profile");
+        console.log("authTokenlogin",token)
+        login({ mobile, token }); // Update context with user data
+        navigate("/profile"); // Redirect to profile
       } else {
-        toast.error("Invalid OTP. Please try again.");
+        toast.error(response.data.message || "Invalid OTP. Please try again.");
       }
     } catch (err) {
+      console.error(err);
       toast.error("Error verifying OTP. Please try again later.");
     }
   };

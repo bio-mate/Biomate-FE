@@ -5,7 +5,7 @@ import Login from "./Pages/Login/Login";
 import Home from "./Pages/Home";
 import MultiStepForm from "./Pages/Profile/AddProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import UpdateProfile from "./Pages/Profile/EditProfile";
+import UpdateProfile from "./Pages/Profile/UpdateProfile";
 import ViewProfile from "./Pages/Profile/ViewProfile";
 import Payment from "./Pages/Payment/Payment";
 import Profile from "./Pages/Profile/Profile";
@@ -14,7 +14,7 @@ import Register from "./Pages/Login/Register";
 import AddProfile from "./Pages/Profile/AddProfile";
 import { UserProvider } from "./context/userContext";
 import Main from "./Pages/Login/Main";
-import UserPreviewPage from "./Pages/Profile/UserPreviewPage";
+import PreviewProfile from "./Pages/Profile/PreviewProfile";
 import Error401 from "./Pages/StatusPages/Error401";
 import Error404 from "./Pages/StatusPages/Error404";
 import SuccessPage from "./Pages/StatusPages/Success";
@@ -42,13 +42,13 @@ const App = () => {
             /> */}
             <Route path="/profile" element={<Profile />} />
             <Route path="/addProfile" element={<AddProfile />} />
-            <Route path="/user-profile/success/:id" element={<SuccessPage />} />
+            <Route path="/view-profile/success/:id" element={<SuccessPage />} />
             <Route
-              path="/user-profile/preview/:id"
-              element={<UserPreviewPage edit={false} />}
+              path="/view-profile/preview/:id"
+              element={<PreviewProfile edit={false} />}
             />
             <Route path="/view-profile/:id" element={<ViewProfile />} />
-            <Route path="/edit-profile/:id" element={<UpdateProfile />} />
+            <Route path="/update-profile/:id" element={<UpdateProfile />} />
             <Route
               path="/view-profile/:id"
               element={<ViewProfile edit={true} />}

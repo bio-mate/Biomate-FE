@@ -137,7 +137,8 @@ const AddProfile = () => {
   const [isPublished, setIsPublished] = useState(false);
   const [diet, setDiet] = useState("");
   const [errors, setErrors] = useState({});
-
+  const id = ""
+const [profileId , setProfileId ] = useState(id)
   // Handler for updating input fields
 
   const handleChange = (e, setState) => {
@@ -200,6 +201,7 @@ const AddProfile = () => {
     formData.append("paymentStatus", paymentStatus);
     formData.append("isPublished", isPublished);
     formData.append("diet", diet);
+    formData.append("profileId", profileId);
 
     profileImages.forEach((image, index) => {
       if (image.file) {
@@ -234,7 +236,7 @@ const AddProfile = () => {
       });
       console.log("Response:", response.data);
       const id = response.data.data.newUserProfile._id;
-      navigate(`/user-profile/success/${id}`); // Navigate on success
+      navigate(`/view-profile/success/${id}`); // Navigate on success
     } catch (error) {
       console.error(
         "Error:",
@@ -323,7 +325,11 @@ const AddProfile = () => {
     // Update state in the address and reset district
     setAddress((prevAddress) => ({
       ...prevAddress,
-      residential: { ...prevAddress.residential, state: selectedState, district: "" },
+      residential: {
+        ...prevAddress.residential,
+        state: selectedState,
+        district: "",
+      },
     }));
 
     // Update the districts dropdown based on the selected state
@@ -344,7 +350,7 @@ const AddProfile = () => {
       residential: { ...prevAddress.residential, district: selectedDistrict },
     }));
   };
-  console.log("district", districts)
+  console.log("district", districts);
   return (
     <>
       <Navbar />
@@ -892,9 +898,14 @@ const AddProfile = () => {
                   width: "100%",
                 }}
               >
-                
-                <div style={{display:'flex'}}>
-                  <div style={{ width: "45%", marginBottom: "20px", marginRight:'20px' }}>
+                <div style={{ display: "flex" }}>
+                  <div
+                    style={{
+                      width: "45%",
+                      marginBottom: "20px",
+                      marginRight: "20px",
+                    }}
+                  >
                     <label htmlFor="state">State</label>
                     <select
                       id="state"

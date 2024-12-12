@@ -1,21 +1,22 @@
-// src/Register.js
 import React, { useState } from "react";
-import { fetchData } from "../../utils/api";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import CustomButton from "../../Atoms/CustomButton";
+import TextInput from "../../Atoms/TextInput"; // Import the reusable TextInput component
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 const Footer = styled.div`
-    position: fixed;
-    bottom: 20px;
-    width: 80%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  `;
-  
+  position: fixed;
+  bottom: 20px;
+  width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const Register = () => {
   const [formData, setFormData] = useState({
     mobile: "",
@@ -23,8 +24,9 @@ const Register = () => {
     state: "",
     district: "",
   });
+
   const [errors, setErrors] = useState({});
-  
+const navigate = useNavigate('')
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -51,15 +53,28 @@ const Register = () => {
       return;
     }
 
-    const { success } = await fetchData(
-      "/mate/api/v1/users/register",
-      "POST",
-      formData
-    );
-    if (success) {
-      toast.success("User registered successfully!");
-      setFormData({ mobile: "", name: "", state: "", district: "" });
-      setErrors({});
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/mate/api/v1/users/register",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 201 || response.data.success) {
+        toast.success("User registered successfully!");
+        setFormData({ mobile: "", name: "", state: "", district: "" });
+        setErrors({});
+        setTimeout(() => navigate("/login"), 3000);
+      } else {
+        toast.error("Registration failed! Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      toast.error("Something went wrong. Please try again later.");
     }
   };
 
@@ -68,89 +83,69 @@ const Register = () => {
       <ToastContainer />
       <div className="row justify-content-center">
         <div className="col-md-6">
-          
           <form onSubmit={handleSubmit} className="p-4">
-            <div className="mb-3">
             <img
-            src="/smartphone.png"
-            alt="Male"
-            style={{ width: "50px", marginBottom: "20px" }}
-          />
+              src="/smartphone.png"
+              alt="Mobile"
+              style={{ width: "50px", marginBottom: "20px" }}
+            />
             <h3>Register</h3>
-           
-              <label htmlFor="mobile" className="form-label">
-                Mobile Number
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your mobile number"
-                className={`form-control ${errors.mobile ? "is-invalid" : ""}`}
-                id="mobile"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-              />
-              {errors.mobile && (
-                <div className="invalid-feedback">{errors.mobile}</div>
-              )}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label">
-                Name
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your name"
-                className={`form-control ${errors.name ? "is-invalid" : ""}`}
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-              />
-              {errors.name && (
-                <div className="invalid-feedback">{errors.name}</div>
-              )}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="state" className="form-label">
-                State
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your state"
-                className={`form-control ${errors.state ? "is-invalid" : ""}`}
-                id="state"
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-              />
-              {errors.state && (
-                <div className="invalid-feedback">{errors.state}</div>
-              )}
-            </div>
-            <div className="mb-3">
-              <label htmlFor="district" className="form-label">
-                District
-              </label>
-              <input
-                type="text"
-                placeholder="Enter your district"
-                className={`form-control ${
-                  errors.district ? "is-invalid" : ""
-                }`}
-                id="district"
-                name="district"
-                value={formData.district}
-                onChange={handleChange}
-              />
-              {errors.district && (
-                <div className="invalid-feedback">{errors.district}</div>
-              )}
-            </div>
+
+            <TextInput
+              label="Mobile Number"
+              name="mobile"
+              type="text"
+              placeholder="Enter your mobile number"
+              value={formData.mobile}
+              onChange={handleChange}
+              error={errors.mobile}
+              required
+              icon={<i className="bi bi-phone" />}
+            />
+
+            <TextInput
+              label="Name"
+              name="name"
+              type="text"
+              placeholder="Enter your name"
+              value={formData.name}
+              onChange={handleChange}
+              error={errors.name}
+              required
+              icon={<i className="bi bi-person" />}
+            />
+
+            <TextInput
+              label="State"
+              name="state"
+              type="text"
+              placeholder="Enter your state"
+              value={formData.state}
+              onChange={handleChange}
+              error={errors.state}
+              required
+              icon={<i className="bi bi-geo-alt" />}
+            />
+
+            <TextInput
+              label="District"
+              name="district"
+              type="text"
+              placeholder="Enter your district"
+              value={formData.district}
+              onChange={handleChange}
+              error={errors.district}
+              required
+              icon={<i className="bi bi-house" />}
+            />
+
             <Footer>
-              <CustomButton type="primary" label={"Register"} className="btn btn-primary w-100">
-                
-              </CustomButton>
+              <CustomButton
+                type="primary"
+                label="Register"
+                className="btn btn-primary w-100"
+                onClick={handleSubmit}
+              />
             </Footer>
           </form>
         </div>
