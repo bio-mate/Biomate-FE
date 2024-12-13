@@ -9,23 +9,7 @@ export const useUserContext = () => useContext(UserContext);
 
 // Provider component
 export const UserProvider = ({ children }) => {
-  // const [user, setUser] = useState(null);
 
-  // // Update user details
-  // const updateUser = (userDetails) => {
-  //   setUser(userDetails);
-  // };
-
-  // // Clear user details (e.g., on logout)
-  // const clearUser = () => {
-  //   setUser(null);
-  // };
-
-  // return (
-  //   <UserContext.Provider value={{ user, updateUser, clearUser }}>
-  //     {children}
-  //   </UserContext.Provider>
-  // );
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 

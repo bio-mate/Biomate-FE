@@ -1,29 +1,30 @@
-import React from "react";
-import { colors } from "../theme/theme";
+import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
-  const navigate = useNavigate()
-  const handleClick = ()=>{
-    navigate(`/landingPage`)
-  }
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate(`/landingPage`);
+  };
+
   return (
-    <div
-      className="fixed bottom-0 left-0 right-0 flex justify-around items-center py-2 shadow-lg z-50 mt-5"
-      style={{ background: colors.Red }}
-    >
+    <div className="fixed bottom-0 left-0 right-0 py-3 shadow-lg bg-danger text-white z-50 mt-5">
       <div
-        className="flex flex-col items-center cursor-pointer"
-        style={{ color: "white", fontSize: "20px", textAlign: "center" }}
+        className="text-center cursor-pointer"
+        style={{ fontSize: "20px" }}
       >
-        <span>Create Your Bio with US</span>
-        <span style={{ marginLeft: "10px", textDecoration: "underline" }} onClick={handleClick}>
-          {" "}
+        <span>Create Your Bio with Us</span>
+        <button
+          className="mt-2 text-decoration-underline bg-transparent border-0 text-white"
+          onClick={handleClick}
+          aria-label="Click to create your bio"
+        >
           Click here
-        </span>
+        </button>
       </div>
     </div>
   );
 };
 
-export default Footer;
+export default memo(Footer);

@@ -1,60 +1,29 @@
 import React from "react";
-import styled from "styled-components";
 import PropTypes from "prop-types";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const DropdownContainer = styled.div`
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 5px;
-`;
-
-const RequiredIndicator = styled.span`
-  color: red;
-  margin-left: 5px;
-`;
-
-const StyledSelect = styled.select`
-  padding: 8px;
-  border: 1px solid ${({ hasError }) => (hasError ? "red" : "#ccc")};
-  border-radius: 4px;
-  font-size: 16px;
-  transition: border-color 0.3s;
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-`;
-
-const ErrorMessage = styled.p`
-  color: red;
-  font-size: 14px;
-  margin-top: 5px;
-`;
-
-const DropdownInput = ({ 
-  label, 
-  name, 
-  value, 
-  onChange, 
-  options, 
-  error, 
-  required = false 
+const DropdownInput = ({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  error,
+  required = false,
 }) => (
-  <DropdownContainer>
-    <Label htmlFor={name}>
+  <div className="mb-3">
+    <label htmlFor={name} className="form-label">
       {label}
-      {required && <RequiredIndicator>*</RequiredIndicator>}
-    </Label>
-    <StyledSelect
+      {required && <span className="text-danger ms-1">*</span>}
+    </label>
+    <select
       id={name}
       name={name}
       value={value}
       onChange={onChange}
-      hasError={!!error}
+      className={`form-select ${error ? "is-invalid" : ""}`}
+      aria-required={required}
+      aria-invalid={!!error}
     >
       <option value="" disabled>
         Select an option
@@ -64,9 +33,9 @@ const DropdownInput = ({
           {option.label}
         </option>
       ))}
-    </StyledSelect>
-    {error && <ErrorMessage>{error}</ErrorMessage>}
-  </DropdownContainer>
+    </select>
+    {error && <div className="invalid-feedback">{error}</div>}
+  </div>
 );
 
 DropdownInput.propTypes = {
@@ -82,6 +51,11 @@ DropdownInput.propTypes = {
   ).isRequired,
   error: PropTypes.string,
   required: PropTypes.bool,
+};
+
+DropdownInput.defaultProps = {
+  error: "",
+  required: false,
 };
 
 export default DropdownInput;

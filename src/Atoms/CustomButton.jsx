@@ -1,39 +1,38 @@
 import React from "react";
-import styled from "styled-components";
+import PropTypes from "prop-types";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-const StyledButton = styled.button`
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 20px; /* Rounded corners */
-  border: 2px solid transparent;
-  cursor: pointer;
-  width: 100%;
-
-  /* Primary button styling */
-  background-color: ${({ typeProp }) =>
-    typeProp === "primary" ? "#ff4d4f" : "#ffffff"};
-  color: ${({ typeProp }) => (typeProp === "primary" ? "#ffffff" : "#ff4d4f")};
-  border-color: ${({ typeProp }) =>
-    typeProp === "secondary" ? "#ff4d4f" : "transparent"};
-`;
 
 const CustomButton = ({
   label,
   onClick,
-  type = "secondary", // Default type is secondary
-  className = "", // Allow additional classes if needed
+  type = "secondary", 
+  className = "", 
 }) => {
+  // Map the `type` prop to Bootstrap button classes
+  const buttonClass =
+    type === "primary" ? "btn btn-danger" : "btn btn-outline-danger";
+
   return (
-    <StyledButton
+    <button
       type="button"
-      className={`btn ${className}`}
+      className={`${buttonClass} ${className} w-100`} // Add className for additional customization and make it full width
       onClick={onClick}
-      typeProp={type} // Pass the type prop to StyledButton for dynamic styling
     >
       {label}
-    </StyledButton>
+    </button>
   );
+};
+
+CustomButton.propTypes = {
+  label: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+  type: PropTypes.oneOf(["primary", "secondary"]),
+  className: PropTypes.string,
+};
+
+CustomButton.defaultProps = {
+  type: "secondary",
+  className: "",
 };
 
 export default CustomButton;

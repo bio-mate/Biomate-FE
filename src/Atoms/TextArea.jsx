@@ -1,75 +1,62 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React from "react";
+import PropTypes from "prop-types";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const TextAreaWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
+const TextArea = ({
+  label,
+  value,
+  onChange,
+  maxWords = 1000,
+  placeholder,
+  error,
+  icon,
+}) => {
+  const calculateWordCount = (text) => {
+    if (!text) return 0; // Handle empty string
+    return text.trim().split(/\s+/).length;
+  };
 
-const LabelWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 16px;
-`;
-
-const StyledTextArea = styled.textarea`
-  width: 100%;
-  min-height: 150px;
-  padding: 10px;
-  font-size: 16px;
-  border: 2px solid ${(props) => (props.error ? "red" : "#ccc")};
-  border-radius: 5px;
-  resize: vertical;
-  outline: none;
-
-  &:focus {
-    border-color: ${(props) => (props.error ? "red" : "blue")};
-    box-shadow: 0 0 5px ${(props) => (props.error ? "red" : "blue")};
-  }
-`;
-
-const WordCount = styled.p`
-  font-size: 12px;
-  color: ${(props) => (props.exceedLimit ? "red" : "gray")};
-  margin: 0;
-`;
-
-const ErrorMessage = styled.p`
-  font-size: 12px;
-  color: red;
-  margin: 0;
-`;
-
-const TextArea = ({ label, value, onChange, maxWords = 1000, placeholder, error, icon }) => {
-  const wordCount = value.trim().split(/\s+/).filter((word) => word).length;
+  const wordCount = calculateWordCount(value);
   const exceedLimit = wordCount > maxWords;
 
+  const handleInputChange = (e) => {
+    const newText = e.target.value;
+    if (!exceedLimit || calculateWordCount(newText) <= maxWords) {
+      onChange(newText);
+    }
+  };
+
   return (
-    <TextAreaWrapper>
-      <LabelWrapper>
+    <div className="mb-3">
+      <label className="form-label d-flex align-items-center gap-2">
         {icon && <span>{icon}</span>}
-        <label>{label}</label>
-      </LabelWrapper>
-      <StyledTextArea
+        {label}
+      </label>
+      <textarea
+        className={`form-control ${exceedLimit || error ? "is-invalid" : ""}`}
         value={value}
-        onChange={(e) => {
-          if (!exceedLimit || e.target.value.trim().split(/\s+/).length <= maxWords) {
-            onChange(e.target.value);
-          }
-        }}
+        onChange={handleInputChange}
         placeholder={placeholder}
-        error={error || exceedLimit}
-      />
-      <WordCount exceedLimit={exceedLimit}>
+        aria-invalid={error || exceedLimit}
+      ></textarea>
+      <div className="form-text">
         {exceedLimit
-          ? `You have exceeded the word limit by ${wordCount - maxWords} words.`
+          ? `Exceeded word limit by ${wordCount - maxWords} words.`
           : `${maxWords - wordCount} words remaining.`}
-      </WordCount>
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-    </TextAreaWrapper>
+      </div>
+      {error && <div className="invalid-feedback">{error}</div>}
+    </div>
   );
+};
+
+TextArea.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  maxWords: PropTypes.number,
+  placeholder: PropTypes.string,
+  error: PropTypes.string,
+  icon: PropTypes.element,
 };
 
 export default TextArea;

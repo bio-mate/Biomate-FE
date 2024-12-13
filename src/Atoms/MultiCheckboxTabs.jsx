@@ -1,26 +1,6 @@
 import React from "react";
-import styled from "styled-components";
-
-const TabsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px 0;
-`;
-
-const Tab = styled.div`
-  border: 2px solid red;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  background-color: ${(props) => (props.selected ? "red" : "transparent")};
-  color: ${(props) => (props.selected ? "white" : "black")};
-  transition: background-color 0.3s, color 0.3s;
-
-  &:hover {
-    background-color: ${(props) => (props.selected ? "darkred" : "rgba(255, 0, 0, 0.1)")};
-  }
-`;
+import PropTypes from "prop-types";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const MultiCheckboxTabs = ({ options, selectedOptions, onChange, maxSelection }) => {
   const handleTabClick = (option) => {
@@ -32,24 +12,34 @@ const MultiCheckboxTabs = ({ options, selectedOptions, onChange, maxSelection })
       if (selectedOptions.length < maxSelection) {
         onChange([...selectedOptions, option]);
       } else {
+        // Replace with a toast or non-blocking feedback in production
         alert(`You can select up to ${maxSelection} options only.`);
       }
     }
   };
 
   return (
-    <TabsContainer>
+    <div className="d-flex flex-wrap gap-2 mt-2 mb-3" role="tablist">
       {options.map((option) => (
-        <Tab
+        <button
           key={option}
-          selected={selectedOptions.includes(option)}
+          role="tab"
+          aria-selected={selectedOptions.includes(option)}
+          className={`btn ${selectedOptions.includes(option) ? "btn-danger text-white" : "btn-outline-danger"}`}
           onClick={() => handleTabClick(option)}
         >
           {option}
-        </Tab>
+        </button>
       ))}
-    </TabsContainer>
+    </div>
   );
+};
+
+MultiCheckboxTabs.propTypes = {
+  options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  selectedOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onChange: PropTypes.func.isRequired,
+  maxSelection: PropTypes.number.isRequired,
 };
 
 export default MultiCheckboxTabs;

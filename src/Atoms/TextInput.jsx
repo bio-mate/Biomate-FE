@@ -1,82 +1,35 @@
 import React from "react";
-import styled from "styled-components";
 import PropTypes from "prop-types";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const InputContainer = styled.div`
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Label = styled.label`
-  margin-bottom: 5px;
-`;
-
-const RequiredIndicator = styled.span`
-  color: red;
-  margin-left: 5px;
-`;
-
-const StyledInput = styled.input`
-  padding: 8px;
-  border: 1px solid ${({ hasError }) => (hasError ? "red" : "#ccc")};
-  border-radius: 4px;
-  font-size: 16px;
-  transition: border-color 0.3s;
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-`;
-
-const ErrorMessage = styled.p`
-  color: red;
-  font-size: 14px;
-  margin-top: 5px;
-`;
-
-const LabelContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-`;
-
-const IconWrapper = styled.span`
-  margin-right: 8px;
-  display: flex;
-  align-items: center;
-  font-size: 20px; /* Adjust the size of the icon as needed */
-`;
-
-const TextInput = ({ 
-  label, 
-  name, 
-  type = "text", 
-  value, 
-  onChange, 
-  error, 
-  required = false ,
-  icon
+const TextInput = ({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  error,
+  required = false,
+  icon,
 }) => (
-  <InputContainer>
-  <LabelContainer>
-      {icon && <IconWrapper>{icon}</IconWrapper>}
-      <Label htmlFor={name}>
-        {label}
-        {required && <RequiredIndicator>*</RequiredIndicator>}
-      </Label>
-    </LabelContainer>
-   
-    <StyledInput
+  <div className="mb-3">
+    <label htmlFor={name} className="form-label d-flex align-items-center">
+      {icon && <span className="me-2">{icon}</span>}
+      {label}
+      {required && <span className="text-danger ms-1">*</span>}
+    </label>
+    <input
       id={name}
       name={name}
       type={type}
       value={value}
       onChange={onChange}
-      hasError={!!error}
+      className={`form-control ${error ? "is-invalid" : ""}`}
+      aria-required={required}
+      aria-invalid={!!error}
     />
-    {error && <ErrorMessage>{error}</ErrorMessage>}
-  </InputContainer>
+    {error && <div className="invalid-feedback">{error}</div>}
+  </div>
 );
 
 TextInput.propTypes = {
@@ -87,6 +40,14 @@ TextInput.propTypes = {
   onChange: PropTypes.func.isRequired,
   error: PropTypes.string,
   required: PropTypes.bool,
+  icon: PropTypes.element,
 };
 
-export default TextInput;
+TextInput.defaultProps = {
+  type: "text",
+  required: false,
+  error: "",
+  icon: null,
+};
+
+export default React.memo(TextInput);
